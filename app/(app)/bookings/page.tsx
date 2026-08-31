@@ -85,7 +85,7 @@ export default async function BookingsPage({
             <Download size={16} /> Export CSV
           </a>
           <Link href="/bookings/new" className="btn-primary">
-            <Plus size={16} /> New Booking
+            <Plus size={16} /> Create Booking
           </Link>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default async function BookingsPage({
       <Card className="overflow-hidden">
         {rows.length === 0 ? (
           <div className="px-6 py-14 text-center text-sm text-muted">
-            No bookings match your filters.
+            No bookings match your filters. <div className="mt-4"><Link href="/bookings/new" className="btn-primary"><Plus size={16} /> Create Booking</Link></div>
           </div>
         ) : (
           <>

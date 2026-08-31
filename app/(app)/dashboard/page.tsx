@@ -52,7 +52,7 @@ export default async function DashboardPage() {
           <p className="mt-1 text-sm text-muted">Live overview of all production bookings.</p>
         </div>
         <Link href="/bookings/new" className="btn-primary">
-          <Plus size={16} /> New Booking
+          <Plus size={16} /> Create Booking
         </Link>
       </div>
 
