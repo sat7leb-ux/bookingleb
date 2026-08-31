@@ -9,7 +9,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Card, EmptyState } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 export function PeopleManager({ people, initial }: { people: any[]; initial?: any[] }) {
   const router = useRouter();
@@ -93,7 +93,7 @@ export function PeopleManager({ people, initial }: { people: any[]; initial?: an
                 </div>
                 <div className="rounded-lg bg-surface-2/50 px-2.5 py-1.5">
                   <p className="text-muted-2">Last</p>
-                  <p className="font-semibold text-fg">{p.last_booking ? p.last_booking.slice(0, 10) : "—"}</p>
+                  <p className="font-semibold text-fg">{formatDate(p.last_booking)}</p>
                 </div>
               </div>
               {p.whatsapp && <p className="mt-2 truncate text-xs text-muted">📱 {p.whatsapp}</p>}
