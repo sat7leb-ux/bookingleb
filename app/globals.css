@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark broadcast control-room theme (default) */
+  --bg: 9 11 16;
+  --surface: 17 20 28;
+  --surface-2: 23 27 38;
+  --surface-3: 31 37 51;
+  --border: 38 44 60;
+  --border-strong: 56 64 86;
+  --fg: 233 237 245;
+  --muted: 148 158 178;
+  --muted-2: 99 108 128;
+  --primary: 99 102 241;
+  --primary-fg: 255 255 255;
+  --accent: 34 211 238;
+  --success: 52 211 153;
+  --warning: 245 166 35;
+  --danger: 248 113 113;
+  --info: 56 189 248;
+  --violet: 167 139 250;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.light {
+  --bg: 244 246 250;
+  --surface: 255 255 255;
+  --surface-2: 248 250 253;
+  --surface-3: 241 244 249;
+  --border: 224 229 238;
+  --border-strong: 200 207 220;
+  --fg: 17 22 33;
+  --muted: 90 100 120;
+  --muted-2: 140 150 168;
+  --primary: 79 70 229;
+  --primary-fg: 255 255 255;
+  --accent: 8 145 178;
+  --success: 16 185 129;
+  --warning: 217 119 6;
+  --danger: 220 38 38;
+  --info: 2 132 199;
+  --violet: 124 58 237;
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  color-scheme: dark;
+}
+
+.light html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(900px 500px at 12% -8%, rgb(var(--primary) / 0.10), transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, rgb(var(--accent) / 0.07), transparent 55%);
+  background-attachment: fixed;
+  color: rgb(var(--fg));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  ::selection {
+    background: rgb(var(--primary) / 0.35);
+  }
+  /* Visible focus */
+  :focus-visible {
+    outline: 2px solid rgb(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface/80 border border-border rounded-2xl shadow-card backdrop-blur-sm;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:border-border-strong hover:shadow-card-hover;
+  }
+  .input {
+    @apply w-full bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-fg
+      placeholder:text-muted-2 outline-none transition-colors
+      focus:border-primary/70 focus:ring-2 focus:ring-primary/20;
+  }
+  .label {
+    @apply block text-xs font-medium text-muted mb-1.5;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium
+      transition-all duration-150 select-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-primary-fg hover:brightness-110 active:brightness-95 shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.6)];
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-fg hover:bg-surface-2 border border-border;
+  }
+  .btn-soft {
+    @apply btn bg-surface-2 text-fg hover:bg-surface-3 border border-border;
+  }
+  .btn-danger {
+    @apply btn bg-danger/15 text-danger hover:bg-danger/25 border border-danger/30;
+  }
+  .btn-success {
+    @apply btn bg-success/15 text-success hover:bg-success/25 border border-success/30;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .glass {
+    @apply bg-surface/70 backdrop-blur-xl border border-border/70;
+  }
+  .skeleton {
+    @apply relative overflow-hidden bg-surface-2 rounded-md;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(90deg, transparent, rgb(var(--border-strong) / 0.4), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+/* Thin scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-strong));
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Print (call sheet) */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
