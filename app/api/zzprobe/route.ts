@@ -11,16 +11,12 @@ export async function GET(req: NextRequest) {
   try {
     const data = await getBookingById(id);
     out.found = !!data.booking;
-    out.hasReq = !!data.requirements;
-    out.hasTrans = !!data.transportation;
-    out.hasDress = !!data.dress;
     out.activityCount = data.activity.length;
     out.msgCount = data.messages.length;
-    out.bookingKeys = data.booking ? Object.keys(data.booking).slice(0, 20) : null;
-    out.bookingSample = data.booking ? { id: data.booking.id, num: data.booking.booking_number, status: data.booking.confirmation_status, prod: typeof data.booking.production_date, call: typeof data.booking.call_time } : null;
+    out.bookingSample = data.booking ? { id: data.booking.id, num: data.booking.booking_number, status: data.booking.confirmation_status } : null;
   } catch (e: any) {
     out.error = e.message;
-    out.stack = (e.stack || "").split("\n").slice(0, 5);
+    out.stack = (e.stack || "").split("\n").slice(0, 6);
   }
   return NextResponse.json(out);
 }
