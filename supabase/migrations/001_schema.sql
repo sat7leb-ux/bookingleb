@@ -4,7 +4,7 @@
 -- Roles are enforced in application code (lib/auth.ts), not via RLS.
 -- ============================================================================
 
-create extension if not exists "pgcrypto";
+-- gen_random_uuid() is native in Postgres 13+ (Neon runs 16); no extension needed.
 
 -- profiles (users + roles)
 create table if not exists public.profiles (

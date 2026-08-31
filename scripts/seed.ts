@@ -16,7 +16,10 @@ async function run() {
   console.log("→ Applying seed.sql");
   await pool.query(sql);
 
-  // Bootstrap an admin user (idempotent). Override via env if provided.
+  // Seed the single org_settings row (idempotent).
+  await pool.query(
+    "insert into org_settings (id) values ('00000000-0000-0000-0000-000000000001') on conflict (id) do nothing",
+  );
   const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || "admin@bookingleb.app").toLowerCase();
   const pw = process.env.BOOTSTRAP_ADMIN_PASSWORD || "Admin1234!";
   const { rows } = await pool.query("select id from profiles where email = $1", [email]);

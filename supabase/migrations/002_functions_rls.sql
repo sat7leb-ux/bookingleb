@@ -58,6 +58,5 @@ drop trigger if exists trg_booking_number on public.bookings;
 create trigger trg_booking_number before insert on public.bookings
   for each row execute function public.fill_booking_number();
 
--- Seed the single org_settings row (idempotent)
-insert into public.org_settings (id) values ('00000000-0000-0000-0000-000000000001')
-on conflict (id) do nothing;
+-- Seed the single org_settings row (idempotent). Done in scripts/seed.ts
+-- (kept out of this migration so it runs after demo data is inserted).
