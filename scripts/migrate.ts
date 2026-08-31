@@ -8,7 +8,7 @@ if (!url) {
   process.exit(1);
 }
 
-const files = ["supabase/migrations/001_schema.sql", "supabase/migrations/002_functions_rls.sql"];
+const files = ["supabase/migrations/001_schema.sql", "supabase/migrations/002_functions_rls.sql", "supabase/migrations/003_booking_guests.sql"];
 const pool = new Pool({ connectionString: url });
 
 async function run() {

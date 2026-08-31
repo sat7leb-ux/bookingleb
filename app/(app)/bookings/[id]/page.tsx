@@ -19,7 +19,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
         <Link href="/bookings" className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
           <ArrowLeft size={15} /> Back to bookings
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-fg">{data.booking.person?.full_name ?? "Booking"}</h1>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-fg">{data.guests?.[0]?.full_name ?? data.booking.person?.full_name ?? "Booking"}</h1>
         <p className="font-mono text-xs text-muted">{data.booking.booking_number}</p>
       </div>
 
@@ -30,6 +30,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
         dress={data.dress}
         messages={data.messages}
         activity={data.activity}
+        guests={data.guests}
       />
     </div>
   );

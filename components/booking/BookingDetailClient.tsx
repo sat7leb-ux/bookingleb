@@ -23,13 +23,14 @@ import { CONFIRMATION_STATUSES, waLink, formatDate, formatTime, timeAgo } from "
 import { setBookingStatus, cancelBooking, duplicateBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
 
-export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity }: {
+export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests }: {
   booking: any;
   requirements: any;
   transportation: any;
   dress: any;
   messages: any[];
   activity: any[];
+  guests?: { id: string; full_name: string; whatsapp: string | null; email: string | null; role: string | null }[];
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -150,10 +151,23 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
           </div>
         </Section>
 
-        <Section title="Guest Information">
-          <Row k="Name" v={booking.person?.full_name ?? "—"} />
-          <Row k="WhatsApp" v={booking.person?.whatsapp ?? "—"} />
-          <Row k="Email" v={booking.person?.email ?? "—"} />
+        <Section title={guests && guests.length > 1 ? `Guests (${guests.length})` : "Guest Information"}>
+          {guests && guests.length > 0 ? (
+            <div className="space-y-2">
+              {guests.map((g, i) => (
+                <div key={g.id} className="rounded-lg border border-border bg-surface-2/40 px-3 py-2 text-sm">
+                  <div className="font-medium text-fg">{g.full_name}{i === 0 ? " · Primary" : ""}</div>
+                  <div className="text-xs text-muted">{[g.whatsapp, g.email].filter(Boolean).join(" · ") || "—"}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <Row k="Name" v={booking.person?.full_name ?? "—"} />
+              <Row k="WhatsApp" v={booking.person?.whatsapp ?? "—"} />
+              <Row k="Email" v={booking.person?.email ?? "—"} />
+            </>
+          )}
         </Section>
 
         <Section title="Program Information">

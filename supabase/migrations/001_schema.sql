@@ -85,6 +85,17 @@ create table if not exists public.bookings (
   updated_at timestamptz not null default now()
 );
 
+-- Multiple guests per booking (join table).
+create table if not exists public.booking_guests (
+  booking_id uuid not null references public.bookings (id) on delete cascade,
+  person_id  uuid not null references public.people (id) on delete restrict,
+  role       text,
+  notes      text,
+  created_at timestamptz not null default now(),
+  primary key (booking_id, person_id)
+);
+
+
 create table if not exists public.production_requirements (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,

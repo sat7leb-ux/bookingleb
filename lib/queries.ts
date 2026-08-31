@@ -116,8 +116,9 @@ export async function getBookings(opts: {
        pr.name as program_name,
        c.name as channel_name,
        l.name as location_name,
-       t.type as transportation_type,
-       d.code as dress_code
+       tr.type as transportation_type,
+       d.code as dress_code,
+       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count
      ${base}
      order by ${ob} ${od}
      limit $${params.length + 1} offset $${params.length + 2}`,
@@ -128,6 +129,7 @@ export async function getBookings(opts: {
 
 export async function getBookingById(id: string): Promise<{
   booking: JoinedBooking | null;
+  guests: { id: string; full_name: string; whatsapp: string | null; email: string | null; role: string | null }[];
   requirements: any | null;
   transportation: any | null;
   dress: any | null;
@@ -140,8 +142,9 @@ export async function getBookingById(id: string): Promise<{
        pr.name as program_name,
        c.name as channel_name,
        l.name as location_name,
-       t.type as transportation_type,
-       d.code as dress_code
+       tr.type as transportation_type,
+       d.code as dress_code,
+       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count
      from bookings b
      left join people p on p.id = b.person_id
      left join programs pr on pr.id = b.program_id
@@ -163,8 +166,15 @@ export async function getBookingById(id: string): Promise<{
     [id],
   );
   const { rows: messages } = await db<WhatsappMessage>("select * from whatsapp_messages where booking_id = $1 order by created_at desc", [id]);
+  const { rows: guests } = await db<any>(
+    `select p.id, p.full_name, p.whatsapp, p.email, bg.role
+     from booking_guests bg join people p on p.id = bg.person_id
+     where bg.booking_id = $1 order by bg.created_at asc`,
+    [id],
+  );
   return {
     booking,
+    guests: guests.map((g: any) => ({ id: g.id, full_name: g.full_name, whatsapp: g.whatsapp, email: g.email, role: g.role })),
     requirements: req[0] ?? null,
     transportation: transp[0] ?? null,
     dress: dress[0] ?? null,

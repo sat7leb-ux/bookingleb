@@ -65,6 +65,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
   const [form, setForm] = useState<BookingInput>({
     person_id: initial?.person_id ?? null,
+    guest_ids: initial?.guest_ids ?? (initial?.person_id ? [initial.person_id] : []),
     program_id: initial?.program_id ?? null,
     channel_id: initial?.channel_id ?? null,
     production_date: initial?.production_date ?? null,
@@ -105,8 +106,8 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
   }
 
   const errors: Record<number, string[]> = {};
-  if (step === 1 && !form.person_id && !newPerson.full_name) {
-    errors[1] = ["Select an existing guest or create a new one."];
+  if (step === 1 && (!form.guest_ids || form.guest_ids.length === 0) && !newPerson.full_name) {
+    errors[1] = ["Select at least one guest (or create a new one)."];
   }
   if (step === 2 && !form.program_id) errors[2] = ["Select or create a program."];
   if (step === 3) {
@@ -132,6 +133,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
     try {
       // If a new person was typed, create them first via the crud service
       let personId = form.person_id;
+      const guestIds = new Set<string>(form.guest_ids ?? []);
       if (!personId && newPerson.full_name) {
         const fd = new FormData();
         fd.append("full_name", newPerson.full_name);
@@ -147,11 +149,13 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           setSubmitting(false);
           return;
         }
-        personId = json.id;
-        set("person_id", personId);
+        const newId = json.id;
+        personId = newId;
+        set("person_id", newId);
+        guestIds.add(newId);
       }
 
-      const payload: BookingInput = { ...form, person_id: personId };
+      const payload: BookingInput = { ...form, person_id: personId ?? (guestIds.size ? Array.from(guestIds)[0] : null), guest_ids: Array.from(guestIds) };
       const result = editMode
         ? await updateBooking(initial.id, payload)
         : await createBooking(payload);
@@ -170,7 +174,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
   }
 
   const selectedProgram = programs.find((p) => p.id === form.program_id);
-  const selectedPerson = people.find((p) => p.id === form.person_id);
+  const selectedGuests = (form.guest_ids ?? []).map((id) => people.find((p) => p.id === id)).filter(Boolean) as Person[];
 
   return (
     <div className="space-y-5">
@@ -206,31 +210,36 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       </div>
 
       <div className="card p-5 sm:p-6">
-        {/* STEP 1 — Guest */}
+        {/* STEP 1 — Guests (multiple allowed for the same shooting) */}
         {step === 1 && (
           <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Guest / Person</h2>
+            <h2 className="text-base font-semibold text-fg">Guests / People</h2>
+            <p className="text-xs text-muted">Add everyone taking part in this shooting. The first selected guest is the primary contact.</p>
             <div>
-              <label className="label">Select existing guest</label>
+              <label className="label">Add guests</label>
               <SearchableSelect
+                multiple
                 options={people.map((p) => ({
                   value: p.id,
                   label: p.full_name,
                   sub: [p.company, p.whatsapp].filter(Boolean).join(" · "),
                 }))}
-                value={form.person_id}
-                onChange={(v) => {
-                  set("person_id", v);
+                value={form.guest_ids ?? []}
+                onChange={(v: string | string[] | null) => {
+                  const arr = Array.isArray(v) ? v : v ? [v] : [];
+                  set("guest_ids", arr);
+                  if (arr.length) set("person_id", arr[0]);
+                  else set("person_id", null);
                   setNewPerson({});
                 }}
-                placeholder="Search guests…"
+                placeholder="Search and select guests…"
                 allowCreate
                 createLabel="Create guest"
                 onCreate={(name) => setNewPerson({ full_name: name })}
               />
             </div>
 
-            {!form.person_id && (
+            {!form.guest_ids?.length && (
               <div className="space-y-3 rounded-xl border border-border bg-surface-2/50 p-4">
                 <p className="text-xs font-medium text-muted">New guest details</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -243,9 +252,13 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 <textarea className="input min-h-[60px]" placeholder="Notes" value={newPerson.notes ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, notes: e.target.value }))} />
               </div>
             )}
-            {selectedPerson && (
-              <div className="rounded-xl border border-border bg-surface-2/40 px-4 py-3 text-sm text-muted">
-                Selected: <span className="text-fg">{selectedPerson.full_name}</span> · {selectedPerson.whatsapp ?? "no WhatsApp"}
+            {selectedGuests.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedGuests.map((g, i) => (
+                  <span key={g.id} className="rounded-full border border-border bg-surface-2/40 px-3 py-1 text-xs text-fg">
+                    {g.full_name}{i === 0 ? " · Primary" : ""}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -482,7 +495,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 7 && (
           <div className="space-y-4">
             <h2 className="text-base font-semibold text-fg">Review & Confirmation</h2>
-            <ReviewBlock form={form} personName={selectedPerson?.full_name} programName={selectedProgram?.name} channelName={channels.find((c) => c.id === form.channel_id)?.name} locationName={locations.find((l) => l.id === form.location_id)?.name} />
+            <ReviewBlock form={form} personName={selectedGuests[0]?.full_name} programName={selectedProgram?.name} channelName={channels.find((c) => c.id === form.channel_id)?.name} locationName={locations.find((l) => l.id === form.location_id)?.name} />
             {conflict.conflict && (
               <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
                 <AlertTriangle size={18} className="mt-0.5" /> {conflict.reason}

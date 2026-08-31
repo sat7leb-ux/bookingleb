@@ -17,6 +17,7 @@ export default async function EditBookingPage({ params }: { params: { id: string
   const initial = {
     id: data.booking.id,
     person_id: data.booking.person_id,
+    guest_ids: (data.guests ?? []).map((g: any) => g.id),
     program_id: data.booking.program_id,
     channel_id: data.booking.channel_id,
     production_date: data.booking.production_date,
