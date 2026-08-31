@@ -117,11 +117,12 @@ export function initials(name?: string | null): string {
 }
 
 export function formatDate(
-  iso: string | null | undefined,
+  iso: string | Date | null | undefined,
   fmt: string = "MMM d, yyyy",
 ): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const isoStr = iso instanceof Date ? iso.toISOString() : iso;
+  const d = new Date(isoStr);
   if (Number.isNaN(d.getTime())) return "—";
   const map: Record<string, string> = {
     "MMM d, yyyy": d.toLocaleDateString(undefined, {
@@ -129,7 +130,7 @@ export function formatDate(
       day: "numeric",
       year: "numeric",
     }),
-    "yyyy-MM-dd": iso.slice(0, 10),
+    "yyyy-MM-dd": isoStr.slice(0, 10),
     "MMM d": d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
     "EEEE, MMM d": d.toLocaleDateString(undefined, {
       weekday: "long",
@@ -137,18 +138,19 @@ export function formatDate(
       day: "numeric",
     }),
   };
-  return map[fmt] ?? iso.slice(0, 10);
+  return map[fmt] ?? isoStr.slice(0, 10);
 }
 
-export function formatTime(iso: string | null | undefined): string {
+export function formatTime(iso: string | Date | null | undefined): string {
   if (!iso) return "—";
+  const s = iso instanceof Date ? iso.toTimeString().slice(0, 5) : iso;
   // times are stored as HH:mm strings
-  return iso.length >= 5 ? iso.slice(0, 5) : iso;
+  return s.length >= 5 ? s.slice(0, 5) : s;
 }
 
-export function timeAgo(iso: string | null | undefined): string {
+export function timeAgo(iso: string | Date | null | undefined): string {
   if (!iso) return "";
-  const d = new Date(iso).getTime();
+  const d = new Date(iso instanceof Date ? iso.toISOString() : iso).getTime();
   const diff = Date.now() - d;
   const m = Math.round(diff / 60000);
   if (m < 1) return "just now";
