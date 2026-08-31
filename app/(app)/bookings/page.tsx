@@ -111,6 +111,7 @@ export default async function BookingsPage({
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-2">
                     <th className="px-4 py-3 font-medium">Booking ID</th>
                     <th className="px-4 py-3 font-medium">Guest</th>
+                  <th className="px-4 py-3 font-medium">Guests</th>
                     <th className="px-4 py-3 font-medium">Program</th>
                     <th className="px-4 py-3 font-medium">Channel</th>
                     <th className="px-4 py-3 font-medium">Date</th>
@@ -129,6 +130,7 @@ export default async function BookingsPage({
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-fg">{b.person?.full_name ?? "—"}</td>
+                      <td className="px-4 py-3 text-muted">{(b as any).guest_count > 1 ? `${ (b as any).guest_count } guests` : "—"}</td>
                       <td className="px-4 py-3 text-fg">{b.program?.name ?? "—"}</td>
                       <td className="px-4 py-3 text-muted">{b.channel?.name ?? "—"}</td>
                       <td className="px-4 py-3 text-fg">{formatDate(b.production_date)}</td>
@@ -150,7 +152,7 @@ export default async function BookingsPage({
                     <span className="font-mono text-xs text-primary">{b.booking_number}</span>
                     <StatusBadge status={b.confirmation_status} />
                   </div>
-                  <p className="mt-1 text-sm font-medium text-fg">{b.person?.full_name ?? "—"}</p>
+                  <p className="mt-1 text-sm font-medium text-fg">{b.person?.full_name ?? "—"}{((b as any).guest_count > 1) && <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted">{(b as any).guest_count} guests</span>}</p>
                   <p className="text-xs text-muted">{b.program?.name ?? "—"} · {b.channel?.name ?? "—"}</p>
                   <p className="text-xs text-muted-2">{formatDate(b.production_date)} · {b.call_time ?? "—"}</p>
                 </Link>

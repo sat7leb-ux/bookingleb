@@ -104,9 +104,9 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
                         href={`/bookings/${b.id}`}
                         className="block truncate rounded px-1 py-0.5 text-[11px] text-fg"
                         style={{ background: `${STATUS_HEX[b.confirmation_status]}22`, borderLeft: `2px solid ${STATUS_HEX[b.confirmation_status]}` }}
-                        title={`${b.person?.full_name} · ${b.call_time}`}
+                        title={`${b.person?.full_name}${((b as any).guest_count > 1) ? ` +${ (b as any).guest_count - 1 } more` : ""} · ${b.call_time}`}
                       >
-                        {b.call_time} {b.person?.full_name}
+                        {b.call_time} {b.person?.full_name}{((b as any).guest_count > 1) && ` +${ (b as any).guest_count - 1 }`}
                       </Link>
                     ))}
                     {items.length > 3 && <p className="px-1 text-[10px] text-muted-2">+{items.length - 3} more</p>}
@@ -132,7 +132,7 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
                     {items.map((b) => (
                       <Link key={b.id} href={`/bookings/${b.id}`} className="block rounded px-1.5 py-1 text-[11px] text-fg" style={{ background: `${STATUS_HEX[b.confirmation_status]}22`, borderLeft: `2px solid ${STATUS_HEX[b.confirmation_status]}` }}>
                         <p className="font-medium">{b.call_time}</p>
-                        <p className="truncate">{b.person?.full_name}</p>
+                        <p className="truncate">{b.person?.full_name}{((b as any).guest_count > 1) && ` +${ (b as any).guest_count - 1 }`}</p>
                       </Link>
                     ))}
                   </div>
@@ -151,7 +151,7 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
                 <Link key={b.id} href={`/bookings/${b.id}`} className="flex items-center gap-3 rounded-lg border border-border bg-surface-2/40 p-3 transition-colors hover:bg-surface-2">
                   <span className="h-10 w-1 rounded-full" style={{ background: STATUS_HEX[b.confirmation_status] }} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-fg">{b.person?.full_name}</p>
+                    <p className="text-sm font-medium text-fg">{b.person?.full_name}{((b as any).guest_count > 1) && <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted">{ (b as any).guest_count } guests</span>}</p>
                     <p className="text-xs text-muted">{b.program?.name} · {b.channel?.name}</p>
                   </div>
                   <div className="text-right text-sm text-fg">{b.call_time}</div>
