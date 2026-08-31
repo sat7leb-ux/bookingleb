@@ -48,6 +48,7 @@ function hydrateBooking(r: any): JoinedBooking {
   };
 }
 
+// cache-bust getBookingById (force rebuild)
 export async function getBookings(opts: {
   search?: string;
   status?: string;
