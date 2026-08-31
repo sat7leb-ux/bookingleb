@@ -1,44 +1,40 @@
-/* eslint-disable no-console */
-// Seed script — runs the SQL in supabase/seed.sql against a live Supabase
-// project via the Management API. Requires SUPABASE_ACCESS_TOKEN +
-// SUPABASE_PROJECT_REF in .env.local (or env). The anon/service key cannot run
-// arbitrary DDL, so we use the Management REST endpoint.
-//
-// Usage: npm run seed
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { Pool } from "@neondatabase/serverless";
+import bcrypt from "bcryptjs";
 
-const TOKEN = process.env.SUPABASE_ACCESS_TOKEN;
-const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
-
-if (!TOKEN || !PROJECT_REF) {
-  console.error(
-    "Missing SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF. Add them to .env.local.",
-  );
+const url = process.env.DATABASE_URL;
+if (!url) {
+  console.error("DATABASE_URL is not set. Add it to .env.local.");
   process.exit(1);
 }
 
-const sql = readFileSync(resolve(process.cwd(), "supabase/seed.sql"), "utf8");
+const pool = new Pool({ connectionString: url });
 
 async function run() {
-  const res = await fetch(
-    `https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: sql }),
-    },
-  );
-  const text = await res.text();
-  if (!res.ok) {
-    console.error("Seed failed:", res.status, text);
-    process.exit(1);
+  const sql = readFileSync(resolve(process.cwd(), "supabase/seed.sql"), "utf8");
+  console.log("→ Applying seed.sql");
+  await pool.query(sql);
+
+  // Bootstrap an admin user (idempotent). Override via env if provided.
+  const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || "admin@bookingleb.app").toLowerCase();
+  const pw = process.env.BOOTSTRAP_ADMIN_PASSWORD || "Admin1234!";
+  const { rows } = await pool.query("select id from profiles where email = $1", [email]);
+  if (rows.length === 0) {
+    const hash = await bcrypt.hash(pw, 10);
+    await pool.query(
+      "insert into profiles (full_name, email, role, active, password_hash) values ($1,$2,'Administrator',true,$3)",
+      ["Administrator", email, hash],
+    );
+    console.log(`✓ Admin user created: ${email} / ${pw}`);
+  } else {
+    console.log("ℹ Admin user already exists.");
   }
-  console.log("Seed complete.");
-  console.log(text.slice(0, 2000));
+  await pool.end();
 }
 
-run();
+run().catch(async (e) => {
+  console.error("Seed failed:", e.message);
+  await pool.end();
+  process.exit(1);
+});

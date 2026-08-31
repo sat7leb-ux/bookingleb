@@ -1,29 +1,25 @@
 -- ============================================================================
--- SAT-7 Production Booking — Migration 001: Core schema
--- Normalized relational model. All time fields are stored as text HH:mm
--- or ISO dates; booking_number is generated safely by a DB function.
+-- SAT-7 Production Booking — Migration 001: Core schema (Neon Postgres)
+-- Single source of truth = the `profiles` table (no Supabase auth.users).
+-- Roles are enforced in application code (lib/auth.ts), not via RLS.
 -- ============================================================================
 
 create extension if not exists "pgcrypto";
 
--- ----------------------------------------------------------------------------
--- profiles (1:1 with auth.users)
--- ----------------------------------------------------------------------------
+-- profiles (users + roles)
 create table if not exists public.profiles (
-  id uuid primary key references auth.users (id) on delete cascade,
+  id uuid primary key default gen_random_uuid(),
   full_name text,
-  email text not null,
+  email text not null unique,
   role text not null default 'Viewer'
-    check (role in ('Administrator', 'Production Manager', 'Production User', 'Viewer')),
+    check (role in ('Administrator','Production Manager','Production User','Viewer')),
+  password_hash text,
   avatar_url text,
   active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- people (guests / contacts)
--- ----------------------------------------------------------------------------
 create table if not exists public.people (
   id uuid primary key default gen_random_uuid(),
   full_name text not null,
@@ -37,9 +33,6 @@ create table if not exists public.people (
   updated_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- channels
--- ----------------------------------------------------------------------------
 create table if not exists public.channels (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -47,9 +40,6 @@ create table if not exists public.channels (
   created_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- locations
--- ----------------------------------------------------------------------------
 create table if not exists public.locations (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -58,9 +48,6 @@ create table if not exists public.locations (
   created_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- programs
--- ----------------------------------------------------------------------------
 create table if not exists public.programs (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -75,9 +62,6 @@ create table if not exists public.programs (
   updated_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- bookings
--- ----------------------------------------------------------------------------
 create table if not exists public.bookings (
   id uuid primary key default gen_random_uuid(),
   booking_number text not null unique,
@@ -89,23 +73,18 @@ create table if not exists public.bookings (
   start_time text,
   end_time text,
   live_recorded text not null default 'Recorded'
-    check (live_recorded in ('Live', 'Recorded')),
+    check (live_recorded in ('Live','Recorded')),
   episode_number text,
   recorded_episodes_count integer,
   location_id uuid references public.locations (id) on delete restrict,
   extra_notes text,
   confirmation_status text not null default 'Pending Confirmation'
-    check (confirmation_status in (
-      'Pending Confirmation', 'Confirmed', 'Declined',
-      'Reschedule Requested', 'Cancelled')),
-  created_by uuid references auth.users (id) on delete set null,
+    check (confirmation_status in ('Pending Confirmation','Confirmed','Declined','Reschedule Requested','Cancelled')),
+  created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- production_requirements (1:1 with booking)
--- ----------------------------------------------------------------------------
 create table if not exists public.production_requirements (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,
@@ -116,12 +95,10 @@ create table if not exists public.production_requirements (
   top_camera text,
   top_camera_time text,
   top_camera_location text,
-  top_camera_notes text
+  top_camera_notes text,
+  unique (booking_id)
 );
 
--- ----------------------------------------------------------------------------
--- transportation (1:1 with booking)
--- ----------------------------------------------------------------------------
 create table if not exists public.transportation (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,
@@ -130,36 +107,29 @@ create table if not exists public.transportation (
   departure_time text,
   pickup_location text,
   driver text,
-  notes text
+  notes text,
+  unique (booking_id)
 );
 
--- ----------------------------------------------------------------------------
--- dress_codes (1:1 with booking)
--- ----------------------------------------------------------------------------
 create table if not exists public.dress_codes (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,
   code text not null default 'TV Appropriate'
     check (code in ('Formal','Business Casual','Casual','TV Appropriate','Traditional','Other')),
-  notes text
+  notes text,
+  unique (booking_id)
 );
 
--- ----------------------------------------------------------------------------
--- booking_activity (timeline)
--- ----------------------------------------------------------------------------
 create table if not exists public.booking_activity (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,
-  actor_id uuid references auth.users (id) on delete set null,
+  actor_id uuid references public.profiles (id) on delete set null,
   action text not null,
   description text,
   metadata jsonb,
   created_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- whatsapp_messages
--- ----------------------------------------------------------------------------
 create table if not exists public.whatsapp_messages (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings (id) on delete cascade,
@@ -168,13 +138,10 @@ create table if not exists public.whatsapp_messages (
   channel text,
   status text not null default 'prepared'
     check (status in ('prepared','sent','delivered','failed')),
-  created_by uuid references auth.users (id) on delete set null,
+  created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now()
 );
 
--- ----------------------------------------------------------------------------
--- org_settings (single row)
--- ----------------------------------------------------------------------------
 create table if not exists public.org_settings (
   id uuid primary key default '00000000-0000-0000-0000-000000000001',
   org_name text not null default 'SAT-7 Production',
@@ -184,17 +151,11 @@ create table if not exists public.org_settings (
   default_booking_duration integer not null default 120
 );
 
--- ----------------------------------------------------------------------------
--- booking_counters (per-year sequence for booking numbers)
--- ----------------------------------------------------------------------------
 create table if not exists public.booking_counters (
   year integer primary key,
   counter integer not null default 0
 );
 
--- ----------------------------------------------------------------------------
--- indexes
--- ----------------------------------------------------------------------------
 create index if not exists idx_bookings_production_date on public.bookings (production_date);
 create index if not exists idx_bookings_status on public.bookings (confirmation_status);
 create index if not exists idx_bookings_person on public.bookings (person_id);

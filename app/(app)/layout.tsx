@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { AppShell } from "@/components/layout/AppShell";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isDbConfigured } from "@/lib/config";
 
 export default async function AppLayout({
   children,

@@ -1,21 +1,21 @@
 import "server-only";
-import { createCookieClient } from "./supabase/server";
+import { auth } from "@/auth";
+import { db } from "./db";
 import type { Profile, Role } from "./types";
 
+/**
+ * Load the current user from the Auth.js session, then hydrate the profile
+ * (role/active) from Postgres. Replaces the old Supabase cookie client.
+ */
 export async function getCurrentUser(): Promise<Profile | null> {
   try {
-    const sb = createCookieClient();
-    const {
-      data: { user },
-    } = await sb.auth.getUser();
-    if (!user) return null;
-    const { data: profile } = await sb
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
-    if (!profile) return null;
-    return profile as Profile;
+    const session = await auth();
+    if (!session?.user?.email) return null;
+    const { rows } = await db<Profile>(
+      "select * from profiles where email = $1",
+      [session.user.email.toLowerCase()],
+    );
+    return (rows[0] as Profile) ?? null;
   } catch {
     return null;
   }
@@ -24,6 +24,26 @@ export async function getCurrentUser(): Promise<Profile | null> {
 export async function isAdmin(): Promise<boolean> {
   const u = await getCurrentUser();
   return !!u && u.role === "Administrator" && u.active;
+}
+
+export async function isManager(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return (
+    !!u &&
+    u.active &&
+    (u.role === "Administrator" || u.role === "Production Manager")
+  );
+}
+
+export async function canWrite(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return (
+    !!u &&
+    u.active &&
+    (u.role === "Administrator" ||
+      u.role === "Production Manager" ||
+      u.role === "Production User")
+  );
 }
 
 export async function requireUser(): Promise<Profile> {

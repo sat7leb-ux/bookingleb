@@ -1,5 +1,5 @@
 import "server-only";
-import { createCookieClient } from "./supabase/server";
+import { db } from "./db";
 import type {
   Booking,
   Person,
@@ -12,10 +12,6 @@ import type {
   Profile,
 } from "./types";
 
-/**
- * Wrap any query so that an unconfigured / unavailable Supabase degrades to a
- * safe empty result instead of throwing a 500. The UI shows honest states.
- */
 export async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await fn();
@@ -33,6 +29,25 @@ type JoinedBooking = Booking & {
   dress_code: { code: string } | null;
 };
 
+interface BookingRow extends Booking {
+  person_id: string | null;
+  program_id: string | null;
+  channel_id: string | null;
+  location_id: string | null;
+}
+
+function hydrateBooking(r: any): JoinedBooking {
+  return {
+    ...r,
+    person: r.person_full_name ? { id: r.person_id, full_name: r.person_full_name, whatsapp: r.person_whatsapp, email: r.person_email } : null,
+    program: r.program_name ? { id: r.program_id, name: r.program_name } : null,
+    channel: r.channel_name ? { id: r.channel_id, name: r.channel_name } : null,
+    location: r.location_name ? { id: r.location_id, name: r.location_name } : null,
+    transportation: r.transportation_type ? { type: r.transportation_type } : null,
+    dress_code: r.dress_code ? { code: r.dress_code } : null,
+  };
+}
+
 export async function getBookings(opts: {
   search?: string;
   status?: string;
@@ -46,40 +61,68 @@ export async function getBookings(opts: {
   page?: number;
   pageSize?: number;
 } = {}): Promise<{ rows: JoinedBooking[]; total: number }> {
-  const sb = createCookieClient();
-  const page = opts.page ?? 1;
-  const pageSize = opts.pageSize ?? 12;
-
-  let query = sb
-    .from("bookings")
-    .select(
-      `*, person:people(id, full_name, whatsapp, email), program:programs(id, name), channel:channels(id, name), location:locations(id, name), transportation:transportation(type), dress_code:dress_codes(code)`,
-      { count: "exact" },
-    );
-
-  if (opts.status && opts.status !== "all") query = query.eq("confirmation_status", opts.status);
-  if (opts.liveRecorded && opts.liveRecorded !== "all")
-    query = query.eq("live_recorded", opts.liveRecorded);
-  if (opts.programId && opts.programId !== "all") query = query.eq("program_id", opts.programId);
-  if (opts.channelId && opts.channelId !== "all") query = query.eq("channel_id", opts.channelId);
-  if (opts.personId && opts.personId !== "all") query = query.eq("person_id", opts.personId);
-  if (opts.from) query = query.gte("production_date", opts.from);
-  if (opts.to) query = query.lte("production_date", opts.to);
+  const where: string[] = [];
+  const params: unknown[] = [];
+  const add = (clause: string, val: unknown) => {
+    params.push(val);
+    where.push(clause.replace("?", `$${params.length}`));
+  };
+  if (opts.status && opts.status !== "all") add("b.confirmation_status = ?", opts.status);
+  if (opts.liveRecorded && opts.liveRecorded !== "all") add("b.live_recorded = ?", opts.liveRecorded);
+  if (opts.programId && opts.programId !== "all") add("b.program_id = ?", opts.programId);
+  if (opts.channelId && opts.channelId !== "all") add("b.channel_id = ?", opts.channelId);
+  if (opts.personId && opts.personId !== "all") add("b.person_id = ?", opts.personId);
+  if (opts.from) add("b.production_date >= ?", opts.from);
+  if (opts.to) add("b.production_date <= ?", opts.to);
   if (opts.search) {
-    query = query.or(
-      `booking_number.ilike.%${opts.search}%,person.full_name.ilike.%${opts.search}%,program.name.ilike.%${opts.search}%`,
+    params.push(`%${opts.search}%`, `%${opts.search}%`, `%${opts.search}%`);
+    where.push(
+      `(b.booking_number ilike $${params.length - 2} or p.full_name ilike $${params.length - 1} or pr.name ilike $${params.length})`,
     );
   }
+  const w = where.length ? `where ${where.join(" and ")}` : "";
 
-  const sort = opts.sort ?? "production_date.desc";
-  const [field, dir] = sort.split(".");
-  query = query.order(field, { ascending: dir !== "desc" });
+  const [field, dir] = (opts.sort ?? "production_date.desc").split(".");
+  const orderField: Record<string, string> = {
+    production_date: "b.production_date",
+    booking_number: "b.booking_number",
+    call_time: "b.call_time",
+    confirmation_status: "b.confirmation_status",
+  };
+  const ob = orderField[field] ?? "b.production_date";
+  const od = dir === "desc" ? "desc" : "asc";
 
-  query = query.range((page - 1) * pageSize, page * pageSize - 1);
+  const page = opts.page ?? 1;
+  const pageSize = opts.pageSize ?? 12;
+  const offset = (page - 1) * pageSize;
 
-  const { data, error, count } = await query;
-  if (error) throw error;
-  return { rows: (data as JoinedBooking[]) ?? [], total: count ?? 0 };
+  const base = `
+    from bookings b
+    left join people p on p.id = b.person_id
+    left join programs pr on pr.id = b.program_id
+    left join channels c on c.id = b.channel_id
+    left join locations l on l.id = b.location_id
+    left join transportation t on t.booking_id = b.id
+    left join dress_codes d on d.booking_id = b.id
+    ${w}`;
+
+  const { rows: countRows } = await db(`select count(*)::int as n ${base}`, params);
+  const total = (countRows[0] as any)?.n ?? 0;
+
+  const { rows } = await db<any>(
+    `select b.*,
+       p.full_name as person_full_name, p.whatsapp as person_whatsapp, p.email as person_email,
+       pr.name as program_name,
+       c.name as channel_name,
+       l.name as location_name,
+       t.type as transportation_type,
+       d.code as dress_code
+     ${base}
+     order by ${ob} ${od}
+     limit $${params.length + 1} offset $${params.length + 2}`,
+    [...params, pageSize, offset],
+  );
+  return { rows: rows.map(hydrateBooking), total };
 }
 
 export async function getBookingById(id: string): Promise<{
@@ -90,46 +133,42 @@ export async function getBookingById(id: string): Promise<{
   activity: BookingActivity[];
   messages: WhatsappMessage[];
 }> {
-  const sb = createCookieClient();
-  const { data: booking } = await sb
-    .from("bookings")
-    .select(
-      `*, person:people(id, full_name, whatsapp, email), program:programs(id, name), channel:channels(id, name), location:locations(id, name)`,
-    )
-    .eq("id", id)
-    .maybeSingle();
-  const { data: requirements } = await sb
-    .from("production_requirements")
-    .select("*")
-    .eq("booking_id", id)
-    .maybeSingle();
-  const { data: transportation } = await sb
-    .from("transportation")
-    .select("*")
-    .eq("booking_id", id)
-    .maybeSingle();
-  const { data: dress } = await sb
-    .from("dress_codes")
-    .select("*")
-    .eq("booking_id", id)
-    .maybeSingle();
-  const { data: activity } = await sb
-    .from("booking_activity")
-    .select(`*, actor:profiles(id, full_name, email)`)
-    .eq("booking_id", id)
-    .order("created_at", { ascending: false });
-  const { data: messages } = await sb
-    .from("whatsapp_messages")
-    .select("*")
-    .eq("booking_id", id)
-    .order("created_at", { ascending: false });
+  const { rows } = await db<any>(
+    `select b.*,
+       p.full_name as person_full_name, p.whatsapp as person_whatsapp, p.email as person_email,
+       pr.name as program_name,
+       c.name as channel_name,
+       l.name as location_name,
+       t.type as transportation_type,
+       d.code as dress_code
+     from bookings b
+     left join people p on p.id = b.person_id
+     left join programs pr on pr.id = b.program_id
+     left join channels c on c.id = b.channel_id
+     left join locations l on l.id = b.location_id
+     left join transportation tr on tr.booking_id = b.id
+     left join dress_codes d on d.booking_id = b.id
+     where b.id = $1`,
+    [id],
+  );
+  const booking = rows[0] ? hydrateBooking(rows[0]) : null;
+  const { rows: req } = await db("select * from production_requirements where booking_id = $1", [id]);
+  const { rows: transp } = await db("select * from transportation where booking_id = $1", [id]);
+  const { rows: dress } = await db("select * from dress_codes where booking_id = $1", [id]);
+  const { rows: activity } = await db<BookingActivity & { actor_full_name: string | null; actor_email: string | null }>(
+    `select a.*, p.full_name as actor_full_name, p.email as actor_email
+     from booking_activity a left join profiles p on p.id = a.actor_id
+     where a.booking_id = $1 order by a.created_at desc`,
+    [id],
+  );
+  const { rows: messages } = await db<WhatsappMessage>("select * from whatsapp_messages where booking_id = $1 order by created_at desc", [id]);
   return {
-    booking: (booking as JoinedBooking) ?? null,
-    requirements,
-    transportation,
-    dress,
-    activity: (activity as BookingActivity[]) ?? [],
-    messages: (messages as WhatsappMessage[]) ?? [],
+    booking,
+    requirements: req[0] ?? null,
+    transportation: transp[0] ?? null,
+    dress: dress[0] ?? null,
+    activity: activity.map((a) => ({ ...a, actor: a.actor_full_name ? { id: a.actor_id!, full_name: a.actor_full_name, email: a.actor_email! } : null })),
+    messages,
   };
 }
 
@@ -139,74 +178,55 @@ export async function getLookupData(): Promise<{
   channels: Channel[];
   locations: Location[];
 }> {
-  const sb = createCookieClient();
   const [people, programs, channels, locations] = await Promise.all([
-    sb.from("people").select("*").eq("active", true).order("full_name"),
-    sb.from("programs").select("*, channel:channels(name)").eq("active", true).order("name"),
-    sb.from("channels").select("*").eq("active", true).order("name"),
-    sb.from("locations").select("*").eq("active", true).order("name"),
+    db<Person>("select * from people where active = true order by full_name"),
+    db<Program & { channel_name?: string }>("select p.*, c.name as channel_name from programs p left join channels c on c.id = p.channel_id where p.active = true order by p.name"),
+    db<Channel>("select * from channels where active = true order by name"),
+    db<Location>("select * from locations where active = true order by name"),
   ]);
   return {
-    people: (people.data as Person[]) ?? [],
-    programs: (programs.data as Program[]) ?? [],
-    channels: (channels.data as Channel[]) ?? [],
-    locations: (locations.data as Location[]) ?? [],
+    people: people.rows,
+    programs: programs.rows as Program[],
+    channels: channels.rows,
+    locations: locations.rows,
   };
 }
 
 export async function getPeopleWithStats(): Promise<Person[]> {
-  const sb = createCookieClient();
-  const { data } = await sb
-    .from("people")
-    .select(
-      `*, bookings:bookings(count), last:bookings(production_date)`,
-    )
-    .order("full_name");
-  const rows = (data as any[]) ?? [];
-  return rows.map((r) => ({
-    ...r,
-    total_bookings: r.bookings?.[0]?.count ?? 0,
-    last_booking: Array.isArray(r.last)
-      ? r.last.map((b: any) => b.production_date).filter(Boolean).sort().reverse()[0] ?? null
-      : null,
-  })) as Person[];
+  const { rows } = await db<Person & { total_bookings: number; last_booking: string | null }>(
+    `select p.*,
+       (select count(*)::int from bookings b where b.person_id = p.id) as total_bookings,
+       (select max(production_date) from bookings b where b.person_id = p.id) as last_booking
+     from people p order by p.full_name`,
+  );
+  return rows as Person[];
 }
 
 export async function getPrograms(): Promise<Program[]> {
-  const sb = createCookieClient();
-  const { data } = await sb
-    .from("programs")
-    .select("*, channel:channels(name)")
-    .order("name");
-  return (data as Program[]) ?? [];
+  const { rows } = await db<Program & { channel_name?: string }>(
+    "select p.*, c.name as channel_name from programs p left join channels c on c.id = p.channel_id order by p.name",
+  );
+  return rows as Program[];
 }
 
 export async function getChannels(): Promise<Channel[]> {
-  const sb = createCookieClient();
-  const { data } = await sb.from("channels").select("*").order("name");
-  return (data as Channel[]) ?? [];
-}
-
-export async function getProfiles(): Promise<Profile[]> {
-  const sb = createCookieClient();
-  const { data } = await sb.from("profiles").select("*").order("full_name");
-  return (data as Profile[]) ?? [];
+  const { rows } = await db<Channel>("select * from channels order by name");
+  return rows;
 }
 
 export async function getLocations(): Promise<Location[]> {
-  const sb = createCookieClient();
-  const { data } = await sb.from("locations").select("*").order("name");
-  return (data as Location[]) ?? [];
+  const { rows } = await db<Location>("select * from locations order by name");
+  return rows;
+}
+
+export async function getProfiles(): Promise<Profile[]> {
+  const { rows } = await db<Profile>("select * from profiles order by full_name");
+  return rows;
 }
 
 export async function getOrgSettings(): Promise<OrgSettings | null> {
-  const sb = createCookieClient();
-  const { data } = await sb
-    .from("org_settings")
-    .select("*")
-    .limit(1)
-    .maybeSingle();
-  return (data as OrgSettings) ?? null;
+  const { rows } = await db<OrgSettings>("select * from org_settings limit 1");
+  return rows[0] ?? null;
 }
 
 export async function getDashboardStats(): Promise<{
@@ -223,60 +243,41 @@ export async function getDashboardStats(): Promise<{
   recent: JoinedBooking[];
   timeline: BookingActivity[];
 }> {
-  const sb = createCookieClient();
+  const { rows: all } = await db<any>("select b.confirmation_status, b.production_date, b.live_recorded, c.name as channel_name from bookings b left join channels c on c.id = b.channel_id");
   const today = new Date().toISOString().slice(0, 10);
-
-  const [{ data: all }, { data: recent }, { data: timeline }] = await Promise.all([
-    sb.from("bookings").select("confirmation_status, production_date, channel:channels(name), live_recorded"),
-    sb
-      .from("bookings")
-      .select(
-        `*, person:people(id, full_name, whatsapp, email), program:programs(id, name), channel:channels(id, name), location:locations(id, name)`,
-      )
-      .order("production_date", { ascending: true })
-      .limit(8),
-    sb
-      .from("booking_activity")
-      .select(`*, actor:profiles(id, full_name, email)`)
-      .order("created_at", { ascending: false })
-      .limit(8),
-  ]);
-
-  const rows = (all as any[]) ?? [];
-  const count = (s: string) => rows.filter((r) => r.confirmation_status === s).length;
-  const byStatus = [
-    "Pending Confirmation",
-    "Confirmed",
-    "Declined",
-    "Reschedule Requested",
-    "Cancelled",
-  ].map((status) => ({ status, count: count(status) }));
+  const count = (s: string) => all.filter((r) => r.confirmation_status === s).length;
+  const byStatus = ["Pending Confirmation", "Confirmed", "Declined", "Reschedule Requested", "Cancelled"].map((status) => ({ status, count: count(status) }));
   const byChannelMap = new Map<string, number>();
-  rows.forEach((r) => {
-    const name = r.channel?.name || "Unknown";
-    byChannelMap.set(name, (byChannelMap.get(name) ?? 0) + 1);
-  });
-  const byChannel = [...byChannelMap.entries()]
-    .map(([name, c]) => ({ name, count: c }))
-    .sort((a, b) => b.count - a.count);
-  const live = rows.filter((r) => r.live_recorded === "Live").length;
-  const recorded = rows.filter((r) => r.live_recorded === "Recorded").length;
+  all.forEach((r) => { const n = r.channel_name || "Unknown"; byChannelMap.set(n, (byChannelMap.get(n) ?? 0) + 1); });
+  const byChannel = [...byChannelMap.entries()].map(([name, c]) => ({ name, count: c })).sort((a, b) => b.count - a.count);
+  const live = all.filter((r) => r.live_recorded === "Live").length;
+  const recorded = all.filter((r) => r.live_recorded === "Recorded").length;
+
+  const { rows: recent } = await db<any>(
+    `select b.*, p.full_name as person_full_name, pr.name as program_name, c.name as channel_name, l.name as location_name
+     from bookings b
+     left join people p on p.id = b.person_id left join programs pr on pr.id = b.program_id
+     left join channels c on c.id = b.channel_id left join locations l on l.id = b.location_id
+     order by b.production_date asc limit 8`,
+  );
+  const { rows: timeline } = await db<BookingActivity & { actor_full_name: string | null; actor_email: string | null }>(
+    `select a.*, p.full_name as actor_full_name, p.email as actor_email
+     from booking_activity a left join profiles p on p.id = a.actor_id
+     order by a.created_at desc limit 8`,
+  );
 
   return {
-    total: rows.length,
-    today: rows.filter((r) => r.production_date === today).length,
-    upcoming: rows.filter((r) => r.production_date && r.production_date >= today).length,
+    total: all.length,
+    today: all.filter((r) => r.production_date === today).length,
+    upcoming: all.filter((r) => r.production_date && r.production_date >= today).length,
     pending: count("Pending Confirmation"),
     confirmed: count("Confirmed"),
     reschedule: count("Reschedule Requested"),
     cancelled: count("Cancelled"),
     byStatus,
     byChannel,
-    liveVsRecorded: [
-      { type: "Live", count: live },
-      { type: "Recorded", count: recorded },
-    ],
-    recent: (recent as JoinedBooking[]) ?? [],
-    timeline: (timeline as BookingActivity[]) ?? [],
+    liveVsRecorded: [{ type: "Live", count: live }, { type: "Recorded", count: recorded }],
+    recent: recent.map(hydrateBooking),
+    timeline: timeline.map((a) => ({ ...a, actor: a.actor_full_name ? { id: a.actor_id!, full_name: a.actor_full_name, email: a.actor_email! } : null })),
   };
 }

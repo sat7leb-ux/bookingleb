@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isDbConfigured } from "@/lib/config";
 import { LoginForm } from "./LoginForm";
 
 export const metadata = { title: "Sign in — SAT-7 Production Booking" };
@@ -30,10 +30,9 @@ export default async function LoginPage({
         </div>
 
         <div className="card p-6">
-          {!isSupabaseConfigured() && (
+          {!isDbConfigured() && (
             <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
-              Supabase is not configured. Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-              <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in <code>.env.local</code> to enable auth.
+              Database is not configured. Set <code>DATABASE_URL</code> in <code>.env.local</code> to enable auth.
             </div>
           )}
           <LoginForm next={searchParams.next} />
