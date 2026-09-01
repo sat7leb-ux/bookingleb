@@ -22,8 +22,9 @@ import { StatusBadge } from "@/components/ui/Badge";
 import { CONFIRMATION_STATUSES, waLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
 import { setBookingStatus, cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
+import { canEditBooking, canDeleteBooking, canChangeStatus } from "@/lib/auth";
 
-export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests, canEdit, canDelete }: {
+export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests, canEdit, canDelete, canChangeStatus }: {
   booking: any;
   requirements: any;
   transportation: any;
@@ -33,6 +34,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   guests?: { id: string; full_name: string; whatsapp: string | null; email: string | null; role: string | null }[];
   canEdit: boolean;
   canDelete: boolean;
+  canChangeStatus: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -159,15 +161,21 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
           <Row k="Episode" v={booking.episode_number ?? "—"} />
           <Row k="Status" v={<StatusBadge status={booking.confirmation_status} />} />
           <div className="mt-3 flex flex-wrap gap-2">
-            {CONFIRMATION_STATUSES.filter((s) => s !== booking.confirmation_status && s !== "Cancelled").map((s) => (
-              <button key={s} disabled={processing} onClick={() => changeStatus(s)} className="btn-soft text-xs">
-                Mark {s}
-              </button>
-            ))}
-            {booking.confirmation_status !== "Cancelled" && (
-              <button disabled={processing} onClick={() => changeStatus("Cancelled")} className="btn-danger text-xs">Cancel</button>
-            )}
-          </div>
+                      {canChangeStatus ? (
+                        <>
+                          {CONFIRMATION_STATUSES.filter((s) => s !== booking.confirmation_status && s !== "Cancelled").map((s) => (
+                            <button key={s} disabled={processing} onClick={() => changeStatus(s)} className="btn-soft text-xs">
+                              Mark {s}
+                            </button>
+                          ))}
+                          {booking.confirmation_status !== "Cancelled" && (
+                            <button disabled={processing} onClick={() => changeStatus("Cancelled")} className="btn-danger text-xs">Cancel</button>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-xs text-muted">Status can only be changed by Administrators.</span>
+                      )}
+                    </div>
         </Section>
 
         <Section title={guests && guests.length > 1 ? `Guests (${guests.length})` : "Guest Information"}>

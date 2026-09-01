@@ -6,7 +6,7 @@ import { safe } from "@/lib/queries";
 import { BookingDetailClient } from "@/components/booking/BookingDetailClient";
 import { EmptyState } from "@/components/ui/Card";
 import { Radio } from "lucide-react";
-import { canEditBooking, canDeleteBooking } from "@/lib/auth";
+import { canEditBooking, canDeleteBooking, canChangeStatus } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +14,10 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
   const data = await safe(() => getBookingById(params.id), null);
   if (!data || !data.booking) notFound();
 
-  const [canEdit, canDelete] = await Promise.all([
+  const [canEdit, canDelete, canChange] = await Promise.all([
     canEditBooking(),
     canDeleteBooking(),
+    canChangeStatus(),
   ]);
 
   return (
@@ -30,16 +31,17 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
       </div>
 
       <BookingDetailClient
-              booking={data.booking}
-              requirements={data.requirements}
-              transportation={data.transportation}
-              dress={data.dress}
-              messages={data.messages}
-              activity={data.activity}
-              guests={data.guests}
-              canEdit={canEdit}
-              canDelete={canDelete}
-            />
+        booking={data.booking}
+        requirements={data.requirements}
+        transportation={data.transportation}
+        dress={data.dress}
+        messages={data.messages}
+        activity={data.activity}
+        guests={data.guests}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        canChangeStatus={canChange}
+      />
     </div>
   );
 }

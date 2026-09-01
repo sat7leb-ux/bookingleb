@@ -1,7 +1,7 @@
 "use server";
 
 import { db, tx } from "@/lib/db";
-import { getCurrentUser, canWrite, canDeleteBooking } from "@/lib/auth";
+import { getCurrentUser, canWrite, canDeleteBooking, canChangeStatus } from "@/lib/auth";
 import type { Booking } from "@/lib/types";
 import type { BookingFormState } from "./types-shared";
 
@@ -180,7 +180,7 @@ export async function duplicateBooking(id: string): Promise<BookingFormState> {
 export async function setBookingStatus(id: string, status: Booking["confirmation_status"], note?: string): Promise<BookingFormState> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, message: "You must be signed in." };
-  if (!(await canWrite())) return { ok: false, message: "Permission denied." };
+  if (!(await canChangeStatus())) return { ok: false, message: "Only Administrators can change booking status." };
   await db("update bookings set confirmation_status = $1 where id = $2", [status, id]);
   await db("insert into booking_activity (booking_id, actor_id, action, description) values ($1,$2,$3,$4)", [id, user.id, `Status → ${status}`, note || `Status changed to ${status} by ${user.full_name || user.email}`]);
   return { ok: true, message: `Status updated to ${status}.`, bookingId: id };

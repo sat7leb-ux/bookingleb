@@ -76,3 +76,8 @@ export async function canDeleteBooking(): Promise<boolean> {
   const u = await getCurrentUser();
   return !!u && u.active && roleRank(u.role) >= roleRank("Production Manager");
 }
+
+export async function canChangeStatus(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return !!u && u.active && u.role === "Administrator";
+}
