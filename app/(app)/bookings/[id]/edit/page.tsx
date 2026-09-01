@@ -15,7 +15,18 @@ export default async function EditBookingPage({ params }: { params: { id: string
     safe(() => getLookupData(), { people: [], programs: [], channels: [], locations: [] }),
   ]);
   if (!data || !data.booking) notFound();
-  if (!canEdit) notFound();
+
+  if (!canEdit) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-fg">Access Denied</h1>
+          <p className="mt-1 text-sm text-muted">You do not have permission to edit bookings. Contact an administrator to upgrade your role.</p>
+        </div>
+      </div>
+    );
+  }
+
 
   const initial = {
     id: data.booking.id,
