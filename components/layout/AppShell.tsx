@@ -24,6 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import type { Profile } from "@/lib/types";
+import { signOut } from "next-auth/react";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -55,14 +56,12 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
     document.documentElement.classList.toggle("light", next === "light");
   }
 
-  async function signOut() {
+  async function signOutUser() {
     setSigningOut(true);
     try {
-      const res = await fetch("/auth/signout", { method: "POST" });
-      if (res.ok) {
-        router.push("/login");
-        router.refresh();
-      }
+      await signOut({ redirect: false });
+      router.push("/login");
+      router.refresh();
     } finally {
       setSigningOut(false);
     }
@@ -126,7 +125,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
             <p className="truncate text-[11px] text-muted">{user.role}</p>
           </div>
           <button
-            onClick={signOut}
+            onClick={signOutUser}
             disabled={signingOut}
             className="rounded-lg p-1.5 text-muted-2 hover:bg-surface-2 hover:text-danger"
             aria-label="Sign out"

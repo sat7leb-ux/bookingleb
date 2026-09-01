@@ -1,7 +1,11 @@
-import { signOut } from "next-auth/react";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  await signOut({ redirect: false });
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  // Clear all auth cookies
+  res.cookies.set("authjs.session-token", "", { maxAge: 0, path: "/" });
+  res.cookies.set("__Secure-authjs.session-token", "", { maxAge: 0, path: "/" });
+  res.cookies.set("authjs.csrf-token", "", { maxAge: 0, path: "/" });
+  res.cookies.set("__Host-authjs.csrf-token", "", { maxAge: 0, path: "/" });
+  return res;
 }
