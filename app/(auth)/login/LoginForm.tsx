@@ -30,7 +30,7 @@ export function LoginForm({ next }: { next?: string }) {
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="label" htmlFor="email">Email</label>
-        <input id="email" type="email" autoComplete="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@bookingleb.app" />
+        <input id="email" type="email" autoComplete="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@sat7.org" />
       </div>
       <div>
         <label className="label" htmlFor="password">Password</label>

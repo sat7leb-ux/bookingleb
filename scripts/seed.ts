@@ -20,8 +20,8 @@ async function run() {
   await pool.query(
     "insert into org_settings (id) values ('00000000-0000-0000-0000-000000000001') on conflict (id) do nothing",
   );
-  const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || "admin@bookingleb.app").toLowerCase();
-  const pw = process.env.BOOTSTRAP_ADMIN_PASSWORD || "Admin1234!";
+  const email = (process.env.BOOTSTRAP_ADMIN_EMAIL || "eliekhachane@sat7.org").toLowerCase();
+  const pw = process.env.BOOTSTRAP_ADMIN_PASSWORD || "@cc3pt3D2026";
   const { rows } = await pool.query("select id from profiles where email = $1", [email]);
   if (rows.length === 0) {
     const hash = await bcrypt.hash(pw, 10);
