@@ -64,7 +64,7 @@ export function SearchableSelect({
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative" style={{background:"#fff",borderColor:"#ccc"}}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
