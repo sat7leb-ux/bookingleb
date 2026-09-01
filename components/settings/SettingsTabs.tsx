@@ -118,6 +118,7 @@ function RolesPanel({ isAdminUser }: { isAdminUser: boolean }) {
     { name: "Production Manager", desc: "Create/edit/manage bookings, people, programs and channels." },
     { name: "Production User", desc: "Create and update bookings only." },
     { name: "Viewer", desc: "Read-only access to all modules." },
+    { name: "Guest", desc: "View-only access; can confirm/cancel own bookings via token." },
   ];
   return (
     <Card className="p-5">

@@ -20,10 +20,10 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { CONFIRMATION_STATUSES, waLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
-import { setBookingStatus, cancelBooking, duplicateBooking } from "@/services/bookings";
+import { setBookingStatus, cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
 
-export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests }: {
+export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests, canEdit, canDelete }: {
   booking: any;
   requirements: any;
   transportation: any;
@@ -31,6 +31,8 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   messages: any[];
   activity: any[];
   guests?: { id: string; full_name: string; whatsapp: string | null; email: string | null; role: string | null }[];
+  canEdit: boolean;
+  canDelete: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -38,6 +40,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   const [waText, setWaText] = useState("");
   const [processing, setProcessing] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [dupOpen, setDupOpen] = useState(false);
 
   function buildMessage() {
@@ -111,26 +114,42 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   }
 
   async function doDuplicate() {
-    setProcessing(true);
-    const res = await duplicateBooking(booking.id);
-    setProcessing(false);
-    if (!res.ok) toast("error", res.message);
-    else { toast("success", res.message); router.push(`/bookings/${res.bookingId}`); router.refresh(); }
-  }
+      setProcessing(true);
+      const res = await duplicateBooking(booking.id);
+      setProcessing(false);
+      if (!res.ok) toast("error", res.message);
+      else { toast("success", res.message); router.push(`/bookings/${res.bookingId}`); router.refresh(); }
+    }
+
+    async function doDelete() {
+      setProcessing(true);
+      const res = await fetch(`/api/bookings/${booking.id}`, { method: "DELETE" });
+      const data = await res.json();
+      setProcessing(false);
+      if (!data.ok) toast("error", data.message);
+      else { toast("success", data.message); router.push("/bookings"); router.refresh(); }
+    }
 
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center gap-2 print:hidden">
         <StatusBadge status={booking.confirmation_status} />
         <div className="ml-auto flex flex-wrap gap-2">
-          <Button variant="ghost" onClick={() => window.print()}><Printer size={15} /> Print</Button>
-          <Button variant="soft" onClick={openWhatsApp} disabled={processing}><MessageCircle size={15} /> WhatsApp</Button>
-          <Button variant="ghost" onClick={() => router.push(`/bookings/${booking.id}/edit`)}><Pencil size={15} /> Edit</Button>
-          <Button variant="ghost" onClick={() => setDupOpen(true)}><Copy size={15} /> Duplicate</Button>
-          {booking.confirmation_status !== "Cancelled" && (
-            <Button variant="danger" onClick={() => setConfirmCancel(true)}><XCircle size={15} /> Cancel</Button>
-          )}
-        </div>
+                  <Button variant="ghost" onClick={() => window.print()}><Printer size={15} /> Print</Button>
+                  <Button variant="soft" onClick={openWhatsApp} disabled={processing}><MessageCircle size={15} /> WhatsApp</Button>
+                  {canEdit && (
+                    <Button variant="ghost" onClick={() => router.push(`/bookings/${booking.id}/edit`)}><Pencil size={15} /> Edit</Button>
+                  )}
+                  {canEdit && (
+                    <Button variant="ghost" onClick={() => setDupOpen(true)}><Copy size={15} /> Duplicate</Button>
+                  )}
+                  {canDelete && (
+                    <Button variant="ghost" onClick={() => setConfirmDelete(true)}><XCircle size={15} /> Delete</Button>
+                  )}
+                  {booking.confirmation_status !== "Cancelled" && (
+                    <Button variant="danger" onClick={() => setConfirmCancel(true)}><XCircle size={15} /> Cancel</Button>
+                  )}
+                </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 print:grid-cols-2">
@@ -249,22 +268,31 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       </div>
 
       <ConfirmDialog
-        open={confirmCancel}
-        onClose={() => setConfirmCancel(false)}
-        onConfirm={doCancel}
-        title="Cancel this booking?"
-        message="This marks the booking as Cancelled and logs the event. It can be reopened later by changing status."
-        confirmLabel="Cancel Booking"
-      />
-      <ConfirmDialog
-        open={dupOpen}
-        onClose={() => setDupOpen(false)}
-        onConfirm={doDuplicate}
-        title="Duplicate booking?"
-        message="Creates a new pending booking copying all details. You can then edit the date."
-        confirmLabel="Duplicate"
-        danger={false}
-      />
+              open={confirmCancel}
+              onClose={() => setConfirmCancel(false)}
+              onConfirm={doCancel}
+              title="Cancel this booking?"
+              message="This marks the booking as Cancelled and logs the event. It can be reopened later by changing status."
+              confirmLabel="Cancel Booking"
+            />
+            <ConfirmDialog
+              open={confirmDelete}
+              onClose={() => setConfirmDelete(false)}
+              onConfirm={doDelete}
+              title="Delete this booking?"
+              message="This permanently deletes the booking and all related data (guests, requirements, transportation, dress code, activity). This action cannot be undone."
+              confirmLabel="Delete Booking"
+              danger
+            />
+            <ConfirmDialog
+              open={dupOpen}
+              onClose={() => setDupOpen(false)}
+              onConfirm={doDuplicate}
+              title="Duplicate booking?"
+              message="Creates a new pending booking copying all details. You can then edit the date."
+              confirmLabel="Duplicate"
+              danger={false}
+            />
     </>
   );
 }

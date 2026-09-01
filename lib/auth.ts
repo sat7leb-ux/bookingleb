@@ -55,12 +55,24 @@ export async function requireUser(): Promise<Profile> {
 export function roleRank(role: Role): number {
   switch (role) {
     case "Administrator":
-      return 4;
+      return 5;
     case "Production Manager":
-      return 3;
+      return 4;
     case "Production User":
-      return 2;
+      return 3;
     case "Viewer":
+      return 2;
+    case "Guest":
       return 1;
   }
+}
+
+export async function canEditBooking(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return !!u && u.active && roleRank(u.role) >= roleRank("Production User");
+}
+
+export async function canDeleteBooking(): Promise<boolean> {
+  const u = await getCurrentUser();
+  return !!u && u.active && roleRank(u.role) >= roleRank("Production Manager");
 }

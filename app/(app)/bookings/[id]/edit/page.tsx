@@ -4,15 +4,18 @@ import { safe } from "@/lib/queries";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { EmptyState } from "@/components/ui/Card";
 import { Radio } from "lucide-react";
+import { canEditBooking } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditBookingPage({ params }: { params: { id: string } }) {
+  const canEdit = await canEditBooking();
   const [data, lookup] = await Promise.all([
     safe(() => getBookingById(params.id), null),
     safe(() => getLookupData(), { people: [], programs: [], channels: [], locations: [] }),
   ]);
   if (!data || !data.booking) notFound();
+  if (!canEdit) notFound();
 
   const initial = {
     id: data.booking.id,

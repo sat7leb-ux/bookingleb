@@ -1,6 +1,6 @@
 // Domain types — mirror the Supabase schema in supabase/migrations.
 
-export type Role = "Administrator" | "Production Manager" | "Production User" | "Viewer";
+export type Role = "Administrator" | "Production Manager" | "Production User" | "Viewer" | "Guest";
 
 export type ConfirmationStatus =
   | "Pending Confirmation"

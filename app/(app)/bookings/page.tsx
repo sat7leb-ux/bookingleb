@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { formatDate } from "@/lib/utils";
 import { BookingsToolbar } from "@/components/booking/BookingsToolbar";
 import { exportBookingsCsv } from "@/lib/csv";
+import { canWrite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function BookingsPage({
 }: {
   searchParams: Record<string, string | undefined>;
 }) {
+  const canCreate = await canWrite();
   const lookup = await safe(() => getLookupData(), {
     people: [],
     programs: [],
@@ -81,13 +83,15 @@ export default async function BookingsPage({
           <p className="mt-1 text-sm text-muted">{total} total · page {page}</p>
         </div>
         <div className="flex gap-2">
-          <a href={`/bookings?export=csv${new URLSearchParams(searchParams as Record<string, string>)}`} className="btn-soft">
-            <Download size={16} /> Export CSV
-          </a>
-          <Link href="/bookings/new" className="btn-primary">
-            <Plus size={16} /> Create Booking
-          </Link>
-        </div>
+                  <a href={`/bookings?export=csv${new URLSearchParams(searchParams as Record<string, string>)}`} className="btn-soft">
+                    <Download size={16} /> Export CSV
+                  </a>
+                  {canCreate && (
+                    <Link href="/bookings/new" className="btn-primary">
+                      <Plus size={16} /> Create Booking
+                    </Link>
+                  )}
+                </div>
       </div>
 
       <BookingsToolbar

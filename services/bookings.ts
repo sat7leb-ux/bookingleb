@@ -1,7 +1,7 @@
 "use server";
 
 import { db, tx } from "@/lib/db";
-import { getCurrentUser, canWrite } from "@/lib/auth";
+import { getCurrentUser, canWrite, canDeleteBooking } from "@/lib/auth";
 import type { Booking } from "@/lib/types";
 import type { BookingFormState } from "./types-shared";
 
@@ -188,4 +188,17 @@ export async function setBookingStatus(id: string, status: Booking["confirmation
 
 export async function cancelBooking(id: string, reason?: string): Promise<BookingFormState> {
   return setBookingStatus(id, "Cancelled", reason || "Booking cancelled.");
+}
+
+export async function deleteBooking(id: string): Promise<BookingFormState> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, message: "You must be signed in." };
+  if (!(await canDeleteBooking())) return { ok: false, message: "Permission denied: requires Production Manager or Administrator role." };
+  
+  // The cascade deletes will handle related tables
+  const { error } = await db("delete from bookings where id = $1", [id]);
+  if (error) return { ok: false, message: error.message };
+  
+  await db("insert into booking_activity (booking_id, actor_id, action, description) values ($1,$2,'Booking deleted',$3)", [id, user.id, `Booking deleted by ${user.full_name || user.email}`]);
+  return { ok: true, message: "Booking deleted permanently." };
 }

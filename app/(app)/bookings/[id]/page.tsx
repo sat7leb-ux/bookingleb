@@ -6,12 +6,18 @@ import { safe } from "@/lib/queries";
 import { BookingDetailClient } from "@/components/booking/BookingDetailClient";
 import { EmptyState } from "@/components/ui/Card";
 import { Radio } from "lucide-react";
+import { canEditBooking, canDeleteBooking } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function BookingDetailPage({ params }: { params: { id: string } }) {
   const data = await safe(() => getBookingById(params.id), null);
   if (!data || !data.booking) notFound();
+
+  const [canEdit, canDelete] = await Promise.all([
+    canEditBooking(),
+    canDeleteBooking(),
+  ]);
 
   return (
     <div className="space-y-5">
@@ -24,14 +30,16 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
       </div>
 
       <BookingDetailClient
-        booking={data.booking}
-        requirements={data.requirements}
-        transportation={data.transportation}
-        dress={data.dress}
-        messages={data.messages}
-        activity={data.activity}
-        guests={data.guests}
-      />
+              booking={data.booking}
+              requirements={data.requirements}
+              transportation={data.transportation}
+              dress={data.dress}
+              messages={data.messages}
+              activity={data.activity}
+              guests={data.guests}
+              canEdit={canEdit}
+              canDelete={canDelete}
+            />
     </div>
   );
 }

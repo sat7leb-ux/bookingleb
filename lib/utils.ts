@@ -14,6 +14,7 @@ export const ROLES: Role[] = [
   "Production Manager",
   "Production User",
   "Viewer",
+  "Guest",
 ];
 
 export const CONFIRMATION_STATUSES: ConfirmationStatus[] = [
