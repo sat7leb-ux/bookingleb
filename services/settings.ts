@@ -26,6 +26,26 @@ async function hashPassword(pw: string): Promise<string> {
   return bcrypt.hash(pw, 10);
 }
 
+export async function updateUserRole(formData: FormData): Promise<CrudState> {
+  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
+  const id = fd(formData, "id");
+  const role = fd(formData, "role") as Role;
+  if (!id || !ROLES.includes(role)) return { ok: false, message: "Invalid request." };
+  const { error: roleErr } = await db("update profiles set role=$1 where id=$2", [role, id]);
+  if (roleErr) return { ok: false, message: roleErr.message };
+
+  // Handle password update if provided
+  const password = fd(formData, "password");
+  if (password && password.length >= 6) {
+    const hash = await hashPassword(password);
+    const { error: pwErr } = await db("update profiles set password_hash=$1 where id=$2", [hash, id]);
+    if (pwErr) return { ok: false, message: pwErr.message };
+    return { ok: true, message: "User updated: role and password changed." };
+  }
+
+  return { ok: true, message: "User updated successfully." };
+}
+
 export async function createUser(formData: FormData): Promise<CrudState> {
   if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
   const email = fd(formData, "email").trim().toLowerCase();
@@ -45,13 +65,6 @@ export async function createUser(formData: FormData): Promise<CrudState> {
   );
   if (error) return { ok: false, message: error.message };
   return { ok: true, message: `User created successfully: ${email}`, id: rows[0].id };
-}
-
-export async function updateUserRole(formData: FormData): Promise<CrudState> {
-  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
-  const { error } = await db("update profiles set role=$1 where id=$2", [fd(formData, "role"), fd(formData, "id")]);
-  if (error) return { ok: false, message: error.message };
-  return { ok: true, message: "Role updated." };
 }
 
 export async function toggleUserActive(formData: FormData): Promise<CrudState> {

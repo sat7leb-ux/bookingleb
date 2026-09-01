@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, X } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
@@ -14,21 +14,43 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
   const router = useRouter();
   const toast = useToast();
   const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [form, setForm] = useState<any>({ email: "", full_name: "", role: "Production User", password: "" });
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteMsg, setDeleteMsg] = useState("");
 
-  async function create(e: React.FormEvent) {
+  function openAddModal() {
+    setForm({ email: "", full_name: "", role: "Production User", password: "" });
+    setIsEditing(false);
+    setEditingUser(null);
+    setOpen(true);
+  }
+
+  function openEditModal(user: any) {
+    setForm({ email: user.email, full_name: user.full_name || "", role: user.role, password: "" });
+    setIsEditing(true);
+    setEditingUser(user);
+    setOpen(true);
+  }
+
+  async function submitForm(e: React.FormEvent) {
     e.preventDefault();
     const fd = new FormData();
     fd.append("email", form.email);
     fd.append("full_name", form.full_name);
     fd.append("role", form.role);
-    fd.append("password", form.password);
-    const res = await fetch("/api/settings/users", { method: "POST", body: fd }).then((r) => r.json());
+    if (!isEditing || form.password) {
+      fd.append("password", form.password);
+    }
+    const url = isEditing ? "/api/settings/users/role" : "/api/settings/users";
+    const method = "POST";
+    const res = await fetch(url, { method, body: fd }).then((r) => r.json());
     if (!res.ok) { toast("error", res.message); return; }
     toast("success", res.message);
     setOpen(false);
+    setIsEditing(false);
+    setEditingUser(null);
     router.refresh();
   }
 
@@ -52,9 +74,7 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <Button onClick={() => { setForm({ email: "", full_name: "", role: "Production User", password: "" }); setOpen(true); }}>
-          <Plus size={15} /> Add User
-        </Button>
+        <Button onClick={openAddModal}><Plus size={15} /> Add User</Button>
       </div>
       <div className="space-y-2">
         {users.map((u) => (
@@ -72,6 +92,22 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
             >
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
+            {u.id === editingUser?.id && isEditing ? (
+              <button
+                onClick={() => { setIsEditing(false); setEditingUser(null); setOpen(false); }}
+                className="btn-soft text-xs"
+              >
+                <X size={14} />
+              </button>
+            ) : (
+              <button
+                onClick={() => openEditModal(u)}
+                disabled={u.id === currentUserId}
+                className="btn-soft text-xs disabled:opacity-30"
+              >
+                <Pencil size={14} /> Edit
+              </button>
+            )}
             <button
               onClick={() => setDeleteId(u.id)}
               disabled={u.id === currentUserId}
@@ -89,31 +125,62 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
         </div>
       )}
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Add User">
-        <form id="user-form" onSubmit={create} className="space-y-3">
-          <div>
-            <label className="label">Email *</label>
-            <input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          </div>
+      <Modal
+        open={open}
+        onClose={() => { setOpen(false); setIsEditing(false); setEditingUser(null); }}
+        title={isEditing ? "Edit User" : "Add User"}
+      >
+        <form id="user-form" onSubmit={submitForm} className="space-y-3">
+          {!isEditing && (
+            <div>
+              <label className="label">Email *</label>
+              <input
+                className="input"
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+          )}
           <div>
             <label className="label">Full name</label>
-            <input className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+            <input
+              className="input"
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            />
           </div>
           <div>
             <label className="label">Role</label>
-            <select className="input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            <select
+              className="input"
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+            >
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
-          <div>
-            <label className="label">Password *</label>
-            <input className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Enter password for this user" />
-          </div>
-          <p className="text-xs text-muted-2">The user can change their password after first login.</p>
+          {!isEditing && (
+            <div>
+              <label className="label">Password *</label>
+              <input
+                className="input"
+                type="password"
+                required
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="Enter password for this user"
+              />
+            </div>
+          )}
+          <p className="text-xs text-muted-2">
+            {isEditing ? "Leave password blank to keep the current password." : "The user can change their password after first login."}
+          </p>
         </form>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type="submit" form="user-form">Create</Button>
+          <Button variant="ghost" onClick={() => { setOpen(false); setIsEditing(false); setEditingUser(null); }}>Cancel</Button>
+          <Button type="submit" form="user-form">{isEditing ? "Save Changes" : "Create"}</Button>
         </div>
       </Modal>
     </div>
