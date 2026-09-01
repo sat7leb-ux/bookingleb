@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Archive, KeyRound, Search } from "lucide-react";
+import { Plus, Pencil, Archive, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -16,9 +16,8 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ email: "", full_name: "", role: "Production User" });
-  const [pwId, setPwId] = useState<string | null>(null);
-  const [pwMsg, setPwMsg] = useState("");
-  const [archiveId, setArchiveId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteMsg, setDeleteMsg] = useState("");
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -42,21 +41,12 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
     else { toast("success", res.message); router.refresh(); }
   }
 
-  async function resetPw() {
+  async function deleteUser() {
     const fd = new FormData();
-    fd.append("id", pwId ?? "");
-    const res = await fetch("/api/settings/users/reset", { method: "POST", body: fd }).then((r) => r.json());
+    fd.append("id", deleteId ?? "");
+    const res = await fetch("/api/settings/users", { method: "DELETE", body: fd }).then((r) => r.json());
     if (!res.ok) toast("error", res.message);
-    else { setPwMsg(res.message); router.refresh(); }
-  }
-
-  async function toggleActive(u: any) {
-    const fd = new FormData();
-    fd.append("id", u.id);
-    fd.append("active", String(!u.active));
-    const res = await fetch("/api/settings/users/active", { method: "POST", body: fd }).then((r) => r.json());
-    if (!res.ok) toast("error", res.message);
-    else { toast("success", res.message); router.refresh(); }
+    else { setDeleteMsg(res.message); setDeleteId(null); router.refresh(); }
   }
 
   return (
@@ -66,7 +56,7 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
       </div>
       <div className="space-y-2">
         {users.map((u) => (
-          <div key={u.id} className="card flex flex-wrap items-center gap-3 p-3">
+          <div key={u.id} className={`card flex flex-wrap items-center gap-3 p-3 ${u.active ? "" : "opacity-50"}`}>
             <Avatar name={u.full_name ?? u.email} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-fg">{u.full_name ?? u.email}</p>
@@ -76,19 +66,24 @@ export function UsersManager({ users, currentUserId }: { users: any[]; currentUs
               value={u.role}
               disabled={u.id === currentUserId}
               onChange={(e) => changeRole(u, e.target.value)}
-              className="input max-w-[170px]"
+              className="input max-w-[160px]"
             >
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
-            <button onClick={() => setPwId(u.id)} className="btn-soft text-xs" disabled={u.id === currentUserId}><KeyRound size={14} /> Reset</button>
-            <button onClick={() => toggleActive(u)} className="btn-ghost text-xs">{u.active ? "Deactivate" : "Activate"}</button>
+            <button
+              onClick={() => setDeleteId(u.id)}
+              disabled={u.id === currentUserId}
+              className="btn-soft text-xs disabled:opacity-30"
+            >
+              <Trash2 size={14} /> Delete
+            </button>
           </div>
         ))}
       </div>
 
-      {pwMsg && (
-        <div className="rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
-          {pwMsg}
+      {deleteMsg && (
+        <div className="rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs text-success">
+          {deleteMsg}
         </div>
       )}
 

@@ -68,3 +68,15 @@ export async function toggleUserActive(formData: FormData): Promise<CrudState> {
   if (error) return { ok: false, message: error.message };
   return { ok: true, message: formData.get("active") === "true" ? "User activated." : "User deactivated." };
 }
+
+export async function deleteUser(formData: FormData): Promise<CrudState> {
+  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
+  const id = fd(formData, "id");
+  if (!id) return { ok: false, message: "User ID required." };
+  // Prevent deleting yourself
+  const current = await getCurrentUser();
+  if (current?.id === id) return { ok: false, message: "You cannot delete your own account." };
+  const { error } = await db("delete from profiles where id = $1", [id]);
+  if (error) return { ok: false, message: error.message };
+  return { ok: true, message: "User deleted permanently." };
+}
