@@ -8,6 +8,7 @@ import {
   CalendarDays,
   BookOpen,
   Users,
+  ShieldCheck,
   Clapperboard,
   Settings as SettingsIcon,
   Plus,
@@ -29,6 +30,7 @@ const NAV = [
   { href: "/bookings", label: "Bookings", icon: BookOpen },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/people", label: "People", icon: Users },
+  { href: "/users", label: "Users", icon: ShieldCheck },
   { href: "/programs", label: "Programs", icon: Clapperboard },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
