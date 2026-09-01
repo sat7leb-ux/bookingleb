@@ -70,7 +70,7 @@ export function SettingsTabs({ settings, channels, locations, users, currentUser
             <div>
               <label className="label">Booking prefix</label>
               <input name="booking_prefix" className="input" defaultValue={settings?.booking_prefix ?? "SAT7"} />
-              <p className="mt-1 text-xs text-muted-2">Used in generated booking numbers (e.g. SAT7-2026-00001).</p>
+              <p className="mt-1 text-xs text-muted-2">Booking numbers are now simple sequential IDs (001, 002, ...).</p>
             </div>
             <div>
               <label className="label">Time zone</label>
