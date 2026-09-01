@@ -4,9 +4,10 @@ import { getBookings, getLookupData } from "@/lib/queries";
 import { safe } from "@/lib/queries";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/Badge";
+import { StatusSelect } from "@/components/booking/StatusSelect";
 import { Button } from "@/components/ui/Button";
 import { BookingsToolbar } from "@/components/booking/BookingsToolbar";
-import { canWrite } from "@/lib/auth";
+import { canWrite, canChangeStatus } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function BookingsPage({
   searchParams: Record<string, string | undefined>;
 }) {
   const canCreate = await canWrite();
+  const canChange = await canChangeStatus();
   const lookup = await safe(() => getLookupData(), {
     people: [],
     programs: [],
@@ -99,7 +101,7 @@ export default async function BookingsPage({
                   </td>
                   <td className="px-4 py-3 text-fg">{b.program?.name ?? "—"}</td>
                   <td className="px-4 py-3 text-muted">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
-                  <td className="px-4 py-3"><StatusBadge status={b.status} /></td>
+                  <td className="px-4 py-3"><StatusSelect bookingId={b.id} current={b.status} canChange={canChange} /></td>
                   <td className="px-4 py-3 text-muted">{b.channel?.name ?? "—"}</td>
                 </tr>
               ))}
