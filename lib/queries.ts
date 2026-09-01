@@ -37,8 +37,14 @@ interface BookingRow extends Booking {
 }
 
 function hydrateBooking(r: any): JoinedBooking {
+  // Neon returns PostgreSQL DATE values as Date objects. Client views compare
+  // these values to YYYY-MM-DD keys, so normalize once at the server boundary.
+  const productionDate = r.production_date instanceof Date
+    ? r.production_date.toISOString().slice(0, 10)
+    : r.production_date;
   return {
     ...r,
+    production_date: productionDate,
     person: r.person_full_name ? { id: r.person_id, full_name: r.person_full_name, whatsapp: r.person_whatsapp, email: r.person_email } : null,
     program: r.program_name ? { id: r.program_id, name: r.program_name } : null,
     channel: r.channel_name ? { id: r.channel_id, name: r.channel_name } : null,
@@ -103,7 +109,7 @@ export async function getBookings(opts: {
     left join programs pr on pr.id = b.program_id
     left join channels c on c.id = b.channel_id
     left join locations l on l.id = b.location_id
-    left join transportation t on t.booking_id = b.id
+    left join transportation tr on tr.booking_id = b.id
     left join dress_codes d on d.booking_id = b.id
     ${w}`;
 

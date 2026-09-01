@@ -15,6 +15,12 @@ const STATUS_HEX: Record<string, string> = {
 
 type View = "month" | "week" | "day";
 
+function calendarDateKey(date: Date): string {
+  // Keep the browser's calendar date. UTC conversion shifts dates backward
+  // for production users east of UTC.
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 export function CalendarView({ bookings }: { bookings: any[] }) {
   const [view, setView] = useState<View>("month");
   const [cursor, setCursor] = useState(new Date());
@@ -32,7 +38,7 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
   while (cells.length % 7 !== 0) cells.push(new Date(y, m, daysInMonth + cells.length - daysInMonth - (daysInMonth)));
 
   function bookingsOn(date: Date) {
-    const key = date.toISOString().slice(0, 10);
+    const key = calendarDateKey(date);
     return bookings.filter((b) => b.production_date === key);
   }
 
@@ -91,10 +97,10 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
                   className={cn(
                     "min-h-[84px] rounded-lg border p-1.5 text-xs",
                     inMonth ? "border-border/60 bg-surface-2/30" : "border-transparent bg-surface-2/10 text-muted-2",
-                    isToday(date.toISOString().slice(0, 10)) && "border-primary/50",
+                    isToday(calendarDateKey(date)) && "border-primary/50",
                   )}
                 >
-                  <div className={cn("font-medium", isToday(date.toISOString().slice(0, 10)) && "text-primary")}>
+                  <div className={cn("font-medium", isToday(calendarDateKey(date)) && "text-primary")}>
                     {date.getDate()}
                   </div>
                   <div className="mt-1 space-y-1">
@@ -125,7 +131,7 @@ export function CalendarView({ bookings }: { bookings: any[] }) {
               const items = bookingsOn(date);
               return (
                 <div key={i} className="min-h-[300px] rounded-lg border border-border/60 bg-surface-2/30 p-1.5">
-                  <div className={cn("mb-1 text-center text-xs font-medium", isToday(date.toISOString().slice(0, 10)) && "text-primary")}>
+                  <div className={cn("mb-1 text-center text-xs font-medium", isToday(calendarDateKey(date)) && "text-primary")}>
                     {date.toLocaleDateString(undefined, { weekday: "short", day: "numeric" })}
                   </div>
                   <div className="space-y-1">
