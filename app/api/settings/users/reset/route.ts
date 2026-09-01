@@ -1,5 +1,8 @@
-import { resetUserPassword } from "@/services/settings";
-export async function POST(req: Request) {
-  const fd = await req.formData();
-  return Response.json(await resetUserPassword(fd));
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  return NextResponse.json({
+    ok: false,
+    message: "Password reset is now handled during user creation. Set the password in the Add User form.",
+  });
 }

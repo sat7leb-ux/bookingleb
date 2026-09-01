@@ -31,19 +31,20 @@ export async function createUser(formData: FormData): Promise<CrudState> {
   const email = fd(formData, "email").trim().toLowerCase();
   const full_name = fd(formData, "full_name");
   const role = fd(formData, "role") as Role;
+  const password = fd(formData, "password");
   if (!email || !ROLES.includes(role)) return { ok: false, message: "Email and valid role required." };
+  if (!password || password.length < 6) return { ok: false, message: "Password must be at least 6 characters." };
 
   const { rows: existing } = await db("select id from profiles where email = $1", [email]);
   if (existing.length > 0) return { ok: false, message: "A user with this email already exists." };
 
-  const temp = `Promo-${Math.random().toString(36).slice(2, 8)}Xy9!`;
-  const hash = await hashPassword(temp);
+  const hash = await hashPassword(password);
   const { rows, error } = await db<{ id: string }>(
     "insert into profiles (full_name, email, role, active, password_hash) values ($1,$2,$3,true,$4) returning id",
     [full_name, email, role, hash],
   );
   if (error) return { ok: false, message: error.message };
-  return { ok: true, message: `User created. Temporary password: ${temp} (share securely; ask them to change it).`, id: rows[0].id };
+  return { ok: true, message: `User created successfully: ${email}`, id: rows[0].id };
 }
 
 export async function updateUserRole(formData: FormData): Promise<CrudState> {
@@ -51,15 +52,6 @@ export async function updateUserRole(formData: FormData): Promise<CrudState> {
   const { error } = await db("update profiles set role=$1 where id=$2", [fd(formData, "role"), fd(formData, "id")]);
   if (error) return { ok: false, message: error.message };
   return { ok: true, message: "Role updated." };
-}
-
-export async function resetUserPassword(formData: FormData): Promise<CrudState> {
-  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
-  const temp = `Promo-${Math.random().toString(36).slice(2, 8)}Xy9!`;
-  const hash = await hashPassword(temp);
-  const { error } = await db("update profiles set password_hash=$1 where id=$2", [hash, fd(formData, "id")]);
-  if (error) return { ok: false, message: error.message };
-  return { ok: true, message: `Password reset. New temp password: ${temp}` };
 }
 
 export async function toggleUserActive(formData: FormData): Promise<CrudState> {
