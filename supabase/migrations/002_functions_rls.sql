@@ -41,7 +41,7 @@ begin
   on conflict (year) do update set counter = booking_counters.counter + 1
   returning counter into v_counter;
 
-  v_result := v_prefix || '-' || v_year::text || '-' || lpad(v_counter::text, 5, '0');
+  v_result := v_prefix || '-' || v_year::text || '-' || lpad(v_counter::text, 3, '0');
   return v_result;
 end; $$;
 
