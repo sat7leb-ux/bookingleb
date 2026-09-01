@@ -108,14 +108,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
         })}
       </nav>
 
-      <div className="border-t border-border p-3">
-        <Link
-          href="/bookings/new"
-          onClick={onNav}
-          className="btn-primary w-full"
-        >
-          <Plus size={16} /> New Booking
-        </Link>
+      
         <div className="mt-3 flex items-center gap-2.5 rounded-lg px-2 py-1.5">
           <Avatar name={user.full_name} />
           <div className="min-w-0 flex-1">
@@ -190,12 +183,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <Link
-            href="/bookings/new"
-            className="btn-primary hidden sm:inline-flex"
-          >
-            <Plus size={16} /> New Booking
-          </Link>
+          
         </header>
 
         <main className="flex-1 overflow-y-auto">
