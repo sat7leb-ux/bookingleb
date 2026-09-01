@@ -71,7 +71,7 @@ export default async function BookingsPage({
             <thead>
               <tr className="border-b border-border text-left">
                 <th className="px-4 py-3 font-medium text-muted">Booking</th>
-                <th className="px-4 py-3 font-medium text-muted">Guest / Org</th>
+                <th className="px-4 py-3 font-medium text-muted">Person</th>
                 <th className="px-4 py-3 font-medium text-muted">Program</th>
                 <th className="px-4 py-3 font-medium text-muted">Date</th>
                 <th className="px-4 py-3 font-medium text-muted">Status</th>
