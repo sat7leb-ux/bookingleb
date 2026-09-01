@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function StatCard({
   label,
@@ -7,6 +8,7 @@ export function StatCard({
   icon,
   accent = "primary",
   trend,
+  href,
 }: {
   label: string;
   value: string | number;
@@ -14,6 +16,7 @@ export function StatCard({
   icon?: React.ReactNode;
   accent?: "primary" | "success" | "warning" | "violet" | "danger" | "info";
   trend?: string;
+  href?: string;
 }) {
   const accentMap: Record<string, string> = {
     primary: "from-primary/25 to-primary/5 text-primary",
@@ -23,7 +26,8 @@ export function StatCard({
     danger: "from-danger/25 to-danger/5 text-danger",
     info: "from-info/25 to-info/5 text-info",
   };
-  return (
+
+  const content = (
     <div className="card card-hover p-4">
       <div className="flex items-start justify-between">
         <div>
@@ -48,5 +52,13 @@ export function StatCard({
         </div>
       )}
     </div>
+  );
+
+  if (!href) return content;
+
+  return (
+    <Link href={href} className="block">
+      {content}
+    </Link>
   );
 }
