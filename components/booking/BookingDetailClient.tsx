@@ -159,23 +159,28 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
           <Row k="Booking ID" v={<span className="font-mono text-xs">{booking.booking_number}</span>} />
           <Row k="Live / Recorded" v={booking.live_recorded} />
           <Row k="Episode" v={booking.episode_number ?? "—"} />
-          <Row k="Status" v={<StatusBadge status={booking.confirmation_status} />} />
-          <div className="mt-3 flex flex-wrap gap-2">
-                      {canChangeStatus ? (
-                        <>
-                          {CONFIRMATION_STATUSES.filter((s) => s !== booking.confirmation_status && s !== "Cancelled").map((s) => (
-                            <button key={s} disabled={processing} onClick={() => changeStatus(s)} className="btn-soft text-xs">
-                              Mark {s}
-                            </button>
-                          ))}
-                          {booking.confirmation_status !== "Cancelled" && (
-                            <button disabled={processing} onClick={() => changeStatus("Cancelled")} className="btn-danger text-xs">Cancel</button>
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-xs text-muted">Status can only be changed by Administrators.</span>
-                      )}
-                    </div>
+          <Row
+            k="Status"
+            v={
+              canChangeStatus ? (
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={booking.confirmation_status} />
+                  <select
+                    disabled={processing}
+                    value={booking.confirmation_status}
+                    onChange={(e) => changeStatus(e.target.value)}
+                    className="input text-xs py-1 px-2"
+                  >
+                    {CONFIRMATION_STATUSES.filter((s) => s !== booking.confirmation_status).map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <StatusBadge status={booking.confirmation_status} />
+              )
+            }
+          />
         </Section>
 
         <Section title={guests && guests.length > 1 ? `Guests (${guests.length})` : "Guest Information"}>
