@@ -130,13 +130,14 @@ export async function getBookings(opts: {
        l.name as location_name, blocs.locations as location_list,
        tr.type as transportation_type,
        d.code as dress_code,
-       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count
+       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count,
+       to_char(b.production_date, 'YYYY-MM-DD') as production_date_str
      ${base}
      order by ${ob} ${od}
      limit $${params.length + 1} offset $${params.length + 2}`,
     [...params, pageSize, offset],
   );
-  return { rows: rows.map(hydrateBooking), total };
+  return { rows: rows.map((r) => hydrateBooking({ ...r, production_date: r.production_date_str })), total };
 }
 
 export async function getBookingById(id: string): Promise<{
@@ -156,7 +157,8 @@ export async function getBookingById(id: string): Promise<{
        l.name as location_name,
        tr.type as transportation_type,
        d.code as dress_code,
-       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count
+       (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count,
+       to_char(b.production_date, 'YYYY-MM-DD') as production_date_str
      from bookings b
      left join people p on p.id = b.person_id
      left join programs pr on pr.id = b.program_id
@@ -167,7 +169,7 @@ export async function getBookingById(id: string): Promise<{
      where b.id = $1`,
     [id],
   );
-  const booking = rows[0] ? hydrateBooking(rows[0]) : null;
+  const booking = rows[0] ? hydrateBooking({ ...rows[0], production_date: rows[0].production_date_str }) : null;
   const { rows: req } = await db("select * from production_requirements where booking_id = $1", [id]);
   const { rows: transp } = await db("select * from transportation where booking_id = $1", [id]);
   const { rows: dress } = await db("select * from dress_codes where booking_id = $1", [id]);
