@@ -180,18 +180,6 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-fg">New Booking</h1>
-          <p className="mt-1 text-sm text-muted">Complete all steps to create a production booking.</p>
-        </div>
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-3 py-2 text-xs text-muted">
-          <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
-          Step {step} of {STEPS.length}
-        </div>
-      </div>
-
       {/* Stepper */}
       <div className="flex items-center gap-1 overflow-x-auto rounded-2xl border border-border bg-surface/60 p-2 backdrop-blur">
         {STEPS.map((s, i) => {

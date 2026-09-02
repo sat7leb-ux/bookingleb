@@ -21,17 +21,11 @@ export default async function NewBookingPage() {
     );
   }
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">New Booking</h1>
-        <p className="mt-1 text-sm text-muted">Complete the 7-step wizard to schedule a production.</p>
-      </div>
-      <BookingWizard
-        people={lookup.people}
-        programs={lookup.programs}
-        channels={lookup.channels}
-        locations={lookup.locations}
-      />
-    </div>
+    <BookingWizard
+      people={lookup.people}
+      programs={lookup.programs}
+      channels={lookup.channels}
+      locations={lookup.locations}
+    />
   );
 }
