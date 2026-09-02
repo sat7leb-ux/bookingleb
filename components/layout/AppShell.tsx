@@ -70,11 +70,11 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   const Sidebar = ({ onNav }: { onNav?: () => void }) => (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[rgb(var(--primary))] text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
           <span className="text-sm font-bold leading-none text-white">S7</span>
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-fg">SAT<span className="text-[rgb(var(--primary))]">-7</span></p>
+          <p className="text-sm font-bold text-fg">SAT<span className="text-accent">-7</span></p>
           <p className="text-[11px] text-muted">Production Booking</p>
         </div>
       </div>
@@ -97,11 +97,11 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
             >
               <Icon
                 size={18}
-                className={cn(active ? "text-[rgb(var(--accent))]" : "text-muted-2 group-hover:text-fg")}
+                className={cn(active ? "text-accent" : "text-muted-2 group-hover:text-fg")}
               />
               {item.label}
               {active && (
-                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r bg-[rgb(var(--accent))]" />
+                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r bg-accent" />
               )}
             </Link>
           );
