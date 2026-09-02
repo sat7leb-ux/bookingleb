@@ -49,7 +49,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       `*📺 Production Booking Confirmation*`,
       `────────────────────────`,
       `*Booking ID:* ${b.booking_number}`,
-      `*Guest:* ${b.person?.full_name ?? "—"}`,
+      `*Person:* ${b.person?.full_name ?? "—"}`,
       `*Program:* ${b.program?.name ?? "—"}`,
       `*Channel:* ${b.channel?.name ?? "—"}`,
       `*Date:* ${formatDate(b.production_date)}`,
@@ -58,11 +58,18 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       `*Live/Recorded:* ${b.live_recorded}`,
       b.episode_number ? `*Episode:* ${b.episode_number}` : "",
       `*Location:* ${b.location?.name ?? "—"}`,
-      requirements?.place_in ? `*Place-In:* ${requirements.place_in} @ ${requirements.place_in_time ?? "—"}` : "",
-      requirements?.top_camera ? `*Top Camera:* ${requirements.top_camera} @ ${requirements.top_camera_time ?? "—"}` : "",
+      requirements?.place_in ? `*Place-In:* ${requirements.place_in} @ ${requirements.place_in_time ?? "—"} (${requirements.place_in_location ?? "—"})` : "",
+      requirements?.top_camera ? `*Top Camera:* ${requirements.top_camera} @ ${requirements.top_camera_time ?? "—"} (${requirements.top_camera_location ?? "—"})` : "",
       transportation ? `*Transportation:* ${transportation.type}` : "",
       dress ? `*Dress Code:* ${dress.code}` : "",
     ].filter(Boolean);
+    lines.push("");
+    lines.push(`*Please confirm your availability, ${b.person?.full_name ?? ""}:*`);
+    lines.push(`✅ Confirm`);
+    lines.push(`❌ Decline`);
+    lines.push(`📝 Other reason: ...`);
+    lines.push("");
+    lines.push(`_Reply with your choice or comments._`);
     return lines.join("\n");
   }
 
