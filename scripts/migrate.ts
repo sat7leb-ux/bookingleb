@@ -15,6 +15,7 @@ const files = [
   "supabase/migrations/004_booking_locations.sql",
   "supabase/migrations/005_clean_booking_numbers.sql",
   "supabase/migrations/006_fix_booking_numbers.sql",
+  "supabase/migrations/007_remove_remote_virtual.sql",
 ];
 const pool = new Pool({ connectionString: url });
 
