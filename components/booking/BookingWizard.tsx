@@ -181,7 +181,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
   return (
     <div className="space-y-5">
       {/* Stepper */}
-      <div className="flex items-center gap-1 overflow-x-auto rounded-2xl border border-border bg-surface/60 p-2 backdrop-blur">
+      <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-2">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
           const active = s.id === step;
@@ -189,23 +189,32 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           return (
             <div key={s.id} className="flex items-center">
               <button
+                type="button"
                 onClick={() => setStep(s.id)}
                 className={cn(
-                  "group flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm transition-all",
-                  active ? "bg-primary/15 text-fg shadow-sm" : done ? "text-primary" : "text-muted-2 hover:bg-surface-2",
+                  "group flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                  active
+                    ? "bg-surface-2 text-fg"
+                    : done
+                      ? "text-primary"
+                      : "text-muted hover:text-fg",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition-all",
-                    active ? "bg-primary text-primary-fg shadow-lg shadow-primary/25" : done ? "bg-primary/20 text-primary" : "bg-surface-2 text-muted-2 group-hover:text-fg",
+                    "flex h-7 w-7 items-center justify-center rounded-md text-xs",
+                    active
+                      ? "bg-primary text-primary-fg"
+                      : done
+                        ? "bg-primary/15 text-primary"
+                        : "bg-surface text-muted",
                   )}
                 >
-                  {done ? <CheckCircle2 size={16} /> : <Icon size={16} />}
+                  {done ? <CheckCircle2 size={14} /> : <Icon size={14} />}
                 </span>
-                <span className="hidden text-sm font-medium sm:inline">{s.label}</span>
+                <span className="hidden text-xs font-medium sm:inline">{s.label}</span>
               </button>
-              {i < STEPS.length - 1 && <ChevronRight size={14} className="text-muted-2/50 mx-1" />}
+              {i < STEPS.length - 1 && <div className="mx-1 h-4 w-px bg-border/70" />}
             </div>
           );
         })}
@@ -215,8 +224,8 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Person / People</h2>
-              <p className="muted mt-1">Add everyone taking part in this shooting. The first selected person is the primary contact.</p>
+              <h2 className="text-base font-semibold text-fg">Person / People</h2>
+              <p className="mt-1 text-sm text-muted">Add everyone taking part in this shooting. The first selected person is the primary contact.</p>
             </div>
             <div>
               <label className="label">Add people</label>
@@ -269,8 +278,8 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Program</h2>
-              <p className="muted mt-1">Choose the program and channel for this production.</p>
+              <h2 className="text-base font-semibold text-fg">Program</h2>
+              <p className="mt-1 text-sm text-muted">Choose the program and channel for this production.</p>
             </div>
             <div>
               <label className="label">Select program</label>
@@ -349,11 +358,14 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
         {/* STEP 3 — Schedule */}
         {step === 3 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Schedule</h2>
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-base font-semibold text-fg">Schedule</h2>
+              <p className="mt-1 text-sm text-muted">Set the date, time, and location for this production.</p>
+            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="label">Production date *</label>
+                <label className="label">Production date</label>
                 <input type="date" className="input" value={form.production_date ?? ""} onChange={(e) => { set("production_date", e.target.value); setConflict({ conflict: false }); }} onBlur={checkConflict} />
               </div>
               <div>
@@ -377,7 +389,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 />
               </div>
               <div>
-                <label className="label">Call time *</label>
+                <label className="label">Call time</label>
                 <input type="time" className="input" value={form.call_time ?? ""} onChange={(e) => set("call_time", e.target.value)} />
               </div>
               <div>
@@ -406,13 +418,16 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {/* STEP 4 — Production Requirements */}
         {step === 4 && (
           <div className="space-y-5">
-            <h2 className="text-base font-semibold text-fg">Production Requirements</h2>
+            <div>
+              <h2 className="text-base font-semibold text-fg">Production Requirements</h2>
+              <p className="mt-1 text-sm text-muted">Camera placements and timing details.</p>
+            </div>
             <div className="rounded-xl border border-border bg-surface-2/40 p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-medium text-primary">
                 <SlidersHorizontal size={16} /> Place-In Camera
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="In" value={form.requirements?.place_in ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in: e.target.value })} />
+                <input className="input" placeholder="Place-In" value={form.requirements?.place_in ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in: e.target.value })} />
                 <input type="time" className="input" placeholder="Time" value={form.requirements?.place_in_time ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in_time: e.target.value })} />
                 <input className="input" placeholder="Location" value={form.requirements?.place_in_location ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in_location: e.target.value })} />
               </div>
@@ -423,7 +438,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 <SlidersHorizontal size={16} /> Top Camera
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="In" value={form.requirements?.top_camera ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera: e.target.value })} />
+                <input className="input" placeholder="Top Camera" value={form.requirements?.top_camera ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera: e.target.value })} />
                 <input type="time" className="input" placeholder="Time" value={form.requirements?.top_camera_time ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera_time: e.target.value })} />
                 <input className="input" placeholder="Location" value={form.requirements?.top_camera_location ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera_location: e.target.value })} />
               </div>
@@ -434,80 +449,66 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
         {/* STEP 5 — Transportation */}
         {step === 5 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Transportation</h2>
+          <div className="space-y-5">
             <div>
-              <label className="label">Transportation type</label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {TRANSPORTATION_TYPES.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => set("transportation", { ...form.transportation!, type: t })}
-                    className={cn(
-                      "btn justify-start",
-                      form.transportation?.type === t ? "bg-primary/15 text-fg border border-primary/40" : "bg-surface-2 text-muted border border-border",
-                    )}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <h2 className="text-base font-semibold text-fg">Transportation</h2>
+              <p className="mt-1 text-sm text-muted">Log travel and driver details if needed.</p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
+                <label className="label">Type</label>
+                <input className="input" placeholder="Transport type" value={form.transportation?.type ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), type: e.target.value } as any)} />
+              </div>
+              <div>
                 <label className="label">Departure time</label>
-                <input type="time" className="input" value={form.transportation?.departure_time ?? ""} onChange={(e) => set("transportation", { ...form.transportation!, departure_time: e.target.value })} />
+                <input type="time" className="input" value={form.transportation?.departure_time ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), departure_time: e.target.value } as any)} />
+              </div>
+              <div>
+                <label className="label">Pickup location</label>
+                <input className="input" placeholder="Pickup location" value={form.transportation?.pickup_location ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), pickup_location: e.target.value } as any)} />
               </div>
               <div>
                 <label className="label">Driver</label>
-                <input className="input" placeholder="Driver name" value={form.transportation?.driver ?? ""} onChange={(e) => set("transportation", { ...form.transportation!, driver: e.target.value })} />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="label">Pickup location</label>
-                <input className="input" placeholder="Pickup location" value={form.transportation?.pickup_location ?? ""} onChange={(e) => set("transportation", { ...form.transportation!, pickup_location: e.target.value })} />
+                <input className="input" placeholder="Driver name" value={form.transportation?.driver ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), driver: e.target.value } as any)} />
               </div>
             </div>
-            <textarea className="input min-h-[60px]" placeholder="Transportation notes" value={form.transportation?.notes ?? ""} onChange={(e) => set("transportation", { ...form.transportation!, notes: e.target.value })} />
+            <textarea className="input min-h-[60px]" placeholder="Transportation notes" value={form.transportation?.notes ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), notes: e.target.value } as any)} />
           </div>
         )}
 
         {/* STEP 6 — Dress Code */}
         {step === 6 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Dress Code</h2>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {DRESS_CODES.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => set("dress_code", { ...form.dress_code!, code: d })}
-                  className={cn(
-                    "btn justify-start",
-                    form.dress_code?.code === d ? "bg-primary/15 text-fg border border-primary/40" : "bg-surface-2 text-muted border border-border",
-                  )}
-                >
-                  {d}
-                </button>
-              ))}
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-base font-semibold text-fg">Dress Code</h2>
+              <p className="mt-1 text-sm text-muted">Specify attire requirements for talent or guests.</p>
             </div>
-            <textarea className="input min-h-[60px]" placeholder="Additional dress-code notes" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...form.dress_code!, notes: e.target.value })} />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="label">Code</label>
+                <input className="input" placeholder="Dress code" value={form.dress_code?.code ?? ""} onChange={(e) => set("dress_code", { ...form.dress_code, code: e.target.value })} />
+              </div>
+            </div>
+            <textarea className="input min-h-[60px]" placeholder="Dress code notes" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), notes: e.target.value } as any)} />
           </div>
         )}
 
         {/* STEP 7 — Review */}
         {step === 7 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Review & Confirmation</h2>
-            <ReviewBlock form={form} personName={selectedGuests[0]?.full_name} programName={selectedProgram?.name} channelName={channels.find((c) => c.id === form.channel_id)?.name} locationNames={(form.location_ids ?? []).map((lid) => locations.find((l) => l.id === lid)?.name).filter(Boolean).join(", ") || "—"} />
-            {conflict.conflict && (
-              <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
-                <AlertTriangle size={18} className="mt-0.5" /> {conflict.reason}
-              </div>
-            )}
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-base font-semibold text-fg">Review</h2>
+              <p className="mt-1 text-sm text-muted">Check the booking summary before creating.</p>
+            </div>
+            <ReviewBlock
+              form={form}
+              personName={selectedGuests[0]?.full_name}
+              programName={selectedProgram?.name}
+              channelName={channels.find((c) => c.id === form.channel_id)?.name}
+              locationNames={(form.location_ids ?? []).map((lid) => locations.find((l) => l.id === lid)?.name).filter(Boolean).join(", ") || "—"}
+            />
           </div>
         )}
-
         {errors[step] && errors[step].length > 0 && step < 7 && (
           <div className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">
             {errors[step].map((e, i) => <div key={i}>• {e}</div>)}
