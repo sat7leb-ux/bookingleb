@@ -11,14 +11,14 @@
   --fg: 255 255 255;
   --muted: 160 170 180;
   --muted-2: 200 210 220;
-  --primary: 239 68 68;
+  --primary: 59 130 246;
   --primary-fg: 255 255 255;
-  --accent: 239 68 68;
+  --accent: 59 130 246;
   --success: 52 211 153;
   --warning: 245 158 11;
   --danger: 239 68 68;
-  --info: 239 68 68;
-  --violet: 239 68 68;
+  --info: 59 130 246;
+  --violet: 139 92 246;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
