@@ -18,15 +18,21 @@ export async function POST(request: NextRequest) {
     }
 
     const id = loc[0].id;
-    const bl = await sql`select booking_id from public.booking_locations where location_id = ${id}`;
+    let removedBookingLocationRows = 0;
+    try {
+      const bl = await sql`select booking_id from public.booking_locations where location_id = ${id}`;
+      removedBookingLocationRows = bl.length;
+      await sql`delete from public.booking_locations where location_id = ${id}`;
+    } catch {
+      removedBookingLocationRows = 0;
+    }
 
-    await sql`delete from public.booking_locations where location_id = ${id}`;
     await sql`delete from public.locations where id = ${id}`;
 
     return Response.json({
       ok: true,
       removedLocationId: id,
-      removedBookingLocationRows: bl.length,
+      removedBookingLocationRows,
     });
   } catch (e: any) {
     return Response.json({ error: e.message }, { status: 500 });
