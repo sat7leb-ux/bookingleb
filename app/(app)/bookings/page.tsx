@@ -25,22 +25,18 @@ export default async function BookingsPage({
     locations: [],
   });
 
-  const { rows, total } = await safe(
-    () =>
-      getBookings({
-        search: searchParams.q,
-        status: searchParams.status,
-        liveRecorded: searchParams.lr,
-        programId: searchParams.program,
-        channelId: searchParams.channel,
-        personId: searchParams.person,
-        from: searchParams.from,
-        to: searchParams.to,
-        sort: searchParams.sort,
-        page: searchParams.page ? Number(searchParams.page) : 1,
-      }),
-    { rows: [], total: 0 },
-  );
+  const { rows, total } = await getBookings({
+    search: searchParams.q,
+    status: searchParams.status,
+    liveRecorded: searchParams.lr,
+    programId: searchParams.program,
+    channelId: searchParams.channel,
+    personId: searchParams.person,
+    from: searchParams.from,
+    to: searchParams.to,
+    sort: searchParams.sort,
+    page: searchParams.page ? Number(searchParams.page) : 1,
+  });
 
   const page = Number(searchParams.page || 1);
 
