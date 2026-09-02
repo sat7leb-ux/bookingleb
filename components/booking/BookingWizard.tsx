@@ -180,52 +180,19 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
   return (
     <div className="space-y-5">
-      {/* Stepper */}
-      <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-2">
-        {STEPS.map((s, i) => {
-          const Icon = s.icon;
-          const active = s.id === step;
-          const done = s.id < step;
-          return (
-            <div key={s.id} className="flex items-center">
-              <button
-                type="button"
-                onClick={() => setStep(s.id)}
-                className={cn(
-                  "group flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                  active
-                    ? "bg-surface-2 text-fg"
-                    : done
-                      ? "text-primary"
-                      : "text-muted hover:text-fg",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-md text-xs",
-                    active
-                      ? "bg-primary text-primary-fg"
-                      : done
-                        ? "bg-primary/15 text-primary"
-                        : "bg-surface text-muted",
-                  )}
-                >
-                  {done ? <CheckCircle2 size={14} /> : <Icon size={14} />}
-                </span>
-                <span className="hidden text-xs font-medium sm:inline">{s.label}</span>
-              </button>
-              {i < STEPS.length - 1 && <div className="mx-1 h-4 w-px bg-border/70" />}
-            </div>
-          );
-        })}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">New Booking Request</h1>
+          <p className="page-subtitle">Log a production booking request into the production queue.</p>
+        </div>
       </div>
+
       <div className="card p-5 sm:p-6">
-        {/* STEP 1 — Person (multiple allowed for the same shooting) */}
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Person / People</h2>
-              <p className="mt-1 text-sm text-muted">Add everyone taking part in this shooting. The first selected person is the primary contact.</p>
+              <h2 className="section-title">Person / People</h2>
+              <p className="muted mt-1">Add everyone taking part in this shooting. The first selected person is the primary contact.</p>
             </div>
             <div>
               <label className="label">Add people</label>
@@ -252,8 +219,8 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             </div>
 
             {!form.guest_ids?.length && (
-              <div className="card-light p-4">
-                <p className="text-xs font-semibold text-slate-900">New guest details</p>
+              <div className="rounded-xl border border-border bg-surface-2/40 p-4">
+                <p className="text-sm font-medium text-fg">New person details</p>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input className="input" placeholder="Full name *" value={newPerson.full_name ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, full_name: e.target.value }))} />
                   <input className="input" placeholder="WhatsApp number" value={newPerson.whatsapp ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, whatsapp: e.target.value }))} />
@@ -267,19 +234,18 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             {selectedGuests.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedGuests.map((g, i) => (
-                  <span key={g.id} className="badge-primary">{g.full_name}{i === 0 ? " · Primary" : ""}</span>
+                  <span key={g.id} className="chip bg-surface-2 text-fg border border-border">{g.full_name}{i === 0 ? " · Primary" : ""}</span>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {/* STEP 2 — Program */}
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Program</h2>
-              <p className="mt-1 text-sm text-muted">Choose the program and channel for this production.</p>
+              <h2 className="section-title">Program</h2>
+              <p className="muted mt-1">Choose the program and channel for this production.</p>
             </div>
             <div>
               <label className="label">Select program</label>
@@ -356,16 +322,15 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {/* STEP 3 — Schedule */}
         {step === 3 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Schedule</h2>
-              <p className="mt-1 text-sm text-muted">Set the date, time, and location for this production.</p>
+              <h2 className="section-title">Schedule</h2>
+              <p className="muted mt-1">Set the date, time, and location for this production.</p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="label">Production date</label>
+                <label className="label">Production date *</label>
                 <input type="date" className="input" value={form.production_date ?? ""} onChange={(e) => { set("production_date", e.target.value); setConflict({ conflict: false }); }} onBlur={checkConflict} />
               </div>
               <div>
@@ -415,44 +380,42 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {/* STEP 4 — Production Requirements */}
         {step === 4 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Production Requirements</h2>
-              <p className="mt-1 text-sm text-muted">Camera placements and timing details.</p>
+              <h2 className="section-title">Production Requirements</h2>
+              <p className="muted mt-1">Camera placements and timing details.</p>
             </div>
             <div className="rounded-xl border border-border bg-surface-2/40 p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-medium text-primary">
                 <SlidersHorizontal size={16} /> Place-In Camera
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="Place-In" value={form.requirements?.place_in ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in: e.target.value })} />
-                <input type="time" className="input" placeholder="Time" value={form.requirements?.place_in_time ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in_time: e.target.value })} />
-                <input className="input" placeholder="Location" value={form.requirements?.place_in_location ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in_location: e.target.value })} />
+                <input className="input" placeholder="Place-In" value={form.requirements?.place_in ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in: e.target.value })} />
+                <input type="time" className="input" placeholder="Time" value={form.requirements?.place_in_time ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_time: e.target.value })} />
+                <input className="input" placeholder="Location" value={form.requirements?.place_in_location ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_location: e.target.value })} />
               </div>
-              <textarea className="input mt-3 min-h-[50px]" placeholder="Place-In notes" value={form.requirements?.place_in_notes ?? ""} onChange={(e) => set("requirements", { ...form.requirements, place_in_notes: e.target.value })} />
+              <textarea className="input mt-3 min-h-[50px]" placeholder="Place-In notes" value={form.requirements?.place_in_notes ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_notes: e.target.value })} />
             </div>
             <div className="rounded-xl border border-border bg-surface-2/40 p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-medium text-accent">
                 <SlidersHorizontal size={16} /> Top Camera
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="Top Camera" value={form.requirements?.top_camera ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera: e.target.value })} />
-                <input type="time" className="input" placeholder="Time" value={form.requirements?.top_camera_time ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera_time: e.target.value })} />
-                <input className="input" placeholder="Location" value={form.requirements?.top_camera_location ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera_location: e.target.value })} />
+                <input className="input" placeholder="Top Camera" value={form.requirements?.top_camera ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera: e.target.value })} />
+                <input type="time" className="input" placeholder="Time" value={form.requirements?.top_camera_time ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_time: e.target.value })} />
+                <input className="input" placeholder="Location" value={form.requirements?.top_camera_location ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_location: e.target.value })} />
               </div>
-              <textarea className="input mt-3 min-h-[50px]" placeholder="Top Camera notes" value={form.requirements?.top_camera_notes ?? ""} onChange={(e) => set("requirements", { ...form.requirements, top_camera_notes: e.target.value })} />
+              <textarea className="input mt-3 min-h-[50px]" placeholder="Top Camera notes" value={form.requirements?.top_camera_notes ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_notes: e.target.value })} />
             </div>
           </div>
         )}
 
-        {/* STEP 5 — Transportation */}
         {step === 5 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Transportation</h2>
-              <p className="mt-1 text-sm text-muted">Log travel and driver details if needed.</p>
+              <h2 className="section-title">Transportation</h2>
+              <p className="muted mt-1">Travel and logistics for the production team.</p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
@@ -476,121 +439,85 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {/* STEP 6 — Dress Code */}
         {step === 6 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Dress Code</h2>
-              <p className="mt-1 text-sm text-muted">Specify attire requirements for talent or guests.</p>
+              <h2 className="section-title">Dress Code</h2>
+              <p className="muted mt-1">Set the expected dress code for this production.</p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="label">Code</label>
-                <input className="input" placeholder="Dress code" value={form.dress_code?.code ?? ""} onChange={(e) => set("dress_code", { ...form.dress_code, code: e.target.value })} />
+                <input className="input" placeholder="Dress code" value={form.dress_code?.code ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), code: e.target.value } as any)} />
               </div>
             </div>
             <textarea className="input min-h-[60px]" placeholder="Dress code notes" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), notes: e.target.value } as any)} />
           </div>
         )}
 
-        {/* STEP 7 — Review */}
         {step === 7 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-fg">Review</h2>
-              <p className="mt-1 text-sm text-muted">Check the booking summary before creating.</p>
+              <h2 className="section-title">Review</h2>
+              <p className="muted mt-1">Confirm details before submitting the booking request.</p>
             </div>
-            <ReviewBlock
-              form={form}
-              personName={selectedGuests[0]?.full_name}
-              programName={selectedProgram?.name}
-              channelName={channels.find((c) => c.id === form.channel_id)?.name}
-              locationNames={(form.location_ids ?? []).map((lid) => locations.find((l) => l.id === lid)?.name).filter(Boolean).join(", ") || "—"}
-            />
-          </div>
-        )}
-        {errors[step] && errors[step].length > 0 && step < 7 && (
-          <div className="rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">
-            {errors[step].map((e, i) => <div key={i}>• {e}</div>)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border bg-surface-2/40 p-3">
+                <p className="text-xs font-medium text-muted">Person</p>
+                <p className="mt-1 text-sm text-fg">{selectedGuests[0]?.full_name ?? "—"}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-surface-2/40 p-3">
+                <p className="text-xs font-medium text-muted">Program</p>
+                <p className="mt-1 text-sm text-fg">{selectedProgram?.name ?? "—"}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-surface-2/40 p-3">
+                <p className="text-xs font-medium text-muted">Date</p>
+                <p className="mt-1 text-sm text-fg">{form.production_date ?? "—"}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-surface-2/40 p-3">
+                <p className="text-xs font-medium text-muted">Status</p>
+                <p className="mt-1 text-sm text-fg">Pending Confirmation</p>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Nav */}
-        <div className="flex items-center justify-between border-t border-border pt-4">
-          <Button variant="ghost" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
-            <ChevronLeft size={16} /> Back
-          </Button>
-          {step < 7 ? (
-            <Button onClick={() => canNext() && setStep((s) => s + 1)} disabled={!canNext()}>
-              Next <ChevronRight size={16} />
-            </Button>
-          ) : (
-            <Button onClick={submit} disabled={submitting || conflict.conflict}>
-              {submitting ? "Saving…" : editMode ? "Update Booking" : "Create Booking"}
-            </Button>
-          )}
+        <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+          <button type="button" disabled={step === 1} onClick={() => setStep((s) => s - 1)} className="btn-ghost disabled:opacity-30">
+            <ChevronLeft size={15} /> Back
+          </button>
+          <div className="flex items-center gap-2">
+            {errors[step] && errors[step].length > 0 && step < 7 && (
+              <span className="text-xs text-danger">{errors[step].map((e) => `• ${e}`).join(" ")}</span>
+            )}
+            {step < 7 ? (
+              <button type="button" disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="btn-primary disabled:opacity-30">
+                Next <ChevronRight size={15} />
+              </button>
+            ) : (
+              <button type="button" disabled={submitting} onClick={submit} className="btn-primary disabled:opacity-30">
+                {submitting ? "Submitting..." : "Submit Request"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ReviewBlock({
-  form,
-  personName,
-  programName,
-  channelName,
-  locationNames,
-}: {
-  form: BookingInput;
-  personName?: string;
-  programName?: string;
-  channelName?: string;
-  locationNames?: string;
-}) {
-  const rows: [string, string | null][] = [
-    ["Guest", personName ?? "—"],
-    ["Program", programName ?? "—"],
-    ["Channel", channelName ?? "—"],
-    ["Date", form.production_date ?? "—"],
-    ["Call time", form.call_time ?? "—"],
-    ["Start / End", `${form.start_time ?? "—"} / ${form.end_time ?? "—"}`],
-    ["Live / Recorded", form.live_recorded],
-    ["Episode", form.episode_number ?? "—"],
-    ["Location", locationNames ?? "—"],
-    ["Transportation", form.transportation?.type ?? "—"],
-    ["Dress code", form.dress_code?.code ?? "—"],
-  ];
-  return (
-    <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-      {rows.map(([k, v]) => (
-        <div key={k} className="flex items-center justify-between border-b border-border/60 py-2 text-sm">
-          <span className="text-muted">{k}</span>
-          <span className="font-medium text-fg">{v}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          {STEPS.map((s, i) => {
+            const active = s.id === step;
+            const done = s.id < step;
+            return (
+              <div key={s.id} className="flex items-center">
+                <span className={cn("h-2 w-2 rounded-full", done ? "bg-primary" : active ? "bg-primary" : "bg-border")} />
+                {i < STEPS.length - 1 && <div className="mx-1 h-px w-6 bg-border/70" />}
+              </div>
+            );
+          })}
         </div>
-      ))}
-      {(form.requirements?.place_in || form.requirements?.top_camera) && (
-        <div className="sm:col-span-2 rounded-xl bg-surface-2/40 p-3 text-sm">
-          <p className="mb-1 text-muted">Production Requirements</p>
-          {form.requirements?.place_in && <p className="text-fg">Place-In: {form.requirements.place_in} @ {form.requirements.place_in_time ?? "—"}</p>}
-          {form.requirements?.top_camera && <p className="text-fg">Top Camera: {form.requirements.top_camera} @ {form.requirements.top_camera_time ?? "—"}</p>}
-        </div>
-      )}
-      {form.extra_notes && (
-        <div className="sm:col-span-2 text-sm">
-          <span className="text-muted">Notes: </span>
-          <span className="text-fg">{form.extra_notes}</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-lg bg-surface-2/40 px-3 py-2 text-sm">
-      <span className="text-muted">{label}</span>
-      <span className="font-medium text-fg">{value}</span>
+        <span className="text-xs text-muted">Step {step} of {STEPS.length}</span>
+      </div>
     </div>
   );
 }
