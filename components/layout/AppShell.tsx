@@ -132,7 +132,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
+      <aside className="hidden w-64 shrink-0 border-r border-slate-700 bg-[#0f172a] lg:block">
         <Sidebar />
       </aside>
 
@@ -143,9 +143,9 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-border bg-surface animate-fade-in">
+          <aside className="absolute left-0 top-0 h-full w-64 border-r border-slate-700 bg-[#0f172a]">
             <button
-              className="absolute right-3 top-4 text-muted-2 hover:text-fg"
+              className="absolute right-3 top-4 text-slate-400 hover:text-white"
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"
             >
