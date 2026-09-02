@@ -48,6 +48,8 @@ export async function archivePerson(id: string): Promise<CrudState> {
 
 export async function deletePerson(id: string): Promise<CrudState> {
   if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
+  await db("update bookings set person_id = null where person_id = $1", [id]);
+  await db("delete from booking_guests where person_id = $1", [id]);
   await db("delete from people where id = $1", [id]);
   return { ok: true, message: "Person deleted." };
 }
