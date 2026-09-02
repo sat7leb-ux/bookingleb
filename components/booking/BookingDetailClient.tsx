@@ -183,7 +183,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
           />
         </Section>
 
-        <Section title={guests && guests.length > 1 ? `Guests (${guests.length})` : "Guest Information"}>
+        <Section title={guests && guests.length > 1 ? `People (${guests.length})` : "Person Information"}>
           {guests && guests.length > 0 ? (
             <div className="space-y-2">
               {guests.map((g, i) => (

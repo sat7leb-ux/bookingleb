@@ -19,7 +19,7 @@ export function buildWhatsappMessage(b: Booking & {
   lines.push(`*📺 Production Booking Confirmation*`);
   lines.push(`────────────────────────`);
   lines.push(`*Booking ID:* ${b.booking_number}`);
-  lines.push(`*Guest:* ${b.person?.full_name ?? "—"}`);
+  lines.push(`*Person:* ${b.person?.full_name ?? "—"}`);
   lines.push(`*Program:* ${b.program?.name ?? "—"}`);
   lines.push(`*Channel:* ${b.channel?.name ?? "—"}`);
   lines.push(`*Date:* ${formatDate(b.production_date)}`);
@@ -51,6 +51,11 @@ export function buildWhatsappMessage(b: Booking & {
     lines.push(`*Notes:* ${b.extra_notes}`);
   }
   lines.push(``);
-  lines.push(`_Please confirm by replying. Thank you!_`);
+  lines.push(`*Please confirm your availability:*`);
+  lines.push(`✅ Confirm`);
+  lines.push(`❌ Decline`);
+  lines.push(`📝 Other reason: ...`);
+  lines.push(``);
+  lines.push(`_Reply with your choice or comments._`);
   return lines.join("\n");
 }

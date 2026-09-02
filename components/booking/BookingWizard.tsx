@@ -45,7 +45,7 @@ interface WizardProps {
 }
 
 const STEPS = [
-  { id: 1, label: "Guest", icon: User },
+  { id: 1, label: "Person", icon: User },
   { id: 2, label: "Program", icon: Clapperboard },
   { id: 3, label: "Schedule", icon: CalendarClock },
   { id: 4, label: "Production", icon: SlidersHorizontal },
@@ -223,15 +223,15 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         })}
       </div>
       <div className="card p-5 sm:p-6">
-        {/* STEP 1 — Guests (multiple allowed for the same shooting) */}
+        {/* STEP 1 — Person (multiple allowed for the same shooting) */}
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Guests / People</h2>
-              <p className="muted mt-1">Add everyone taking part in this shooting. The first selected guest is the primary contact.</p>
+              <h2 className="section-title">Person / People</h2>
+              <p className="muted mt-1">Add everyone taking part in this shooting. The first selected person is the primary contact.</p>
             </div>
             <div>
-              <label className="label">Add guests</label>
+              <label className="label">Add people</label>
               <SearchableSelect
                 multiple
                 options={people.map((p) => ({
@@ -247,9 +247,9 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                   else set("person_id", null);
                   setNewPerson({});
                 }}
-                placeholder="Search and select guests…"
+                placeholder="Search and select people…"
                 allowCreate
-                createLabel="Create guest"
+                createLabel="Create person"
                 onCreate={(name) => setNewPerson({ full_name: name })}
               />
             </div>
