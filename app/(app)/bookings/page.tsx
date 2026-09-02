@@ -87,20 +87,20 @@ export default async function BookingsPage({
                 </tr>
               )}
               {rows.map((b: any) => (
-                <tr key={b.id} className="border-b border-border/60 hover:bg-surface/60">
+                <tr key={b.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <Link href={`/bookings/${b.id}`} className="font-medium text-accent hover:underline">
                       {b.booking_number}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-fg">{b.person?.full_name ?? b.guest_name ?? "—"}</div>
-                    <div className="text-xs text-muted">{b.person?.organization ?? b.organization ?? ""}</div>
+                    <div className="font-medium text-gray-900">{b.person?.full_name ?? b.guest_name ?? "—"}</div>
+                    <div className="text-xs text-gray-500">{b.person?.organization ?? b.organization ?? ""}</div>
                   </td>
-                  <td className="px-4 py-3 text-fg">{b.program?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-muted">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
+                  <td className="px-4 py-3 text-gray-900">{b.program?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
                   <td className="px-4 py-3"><StatusSelect bookingId={b.id} current={b.confirmation_status} canChange={canChange} /></td>
-                  <td className="px-4 py-3 text-muted">{b.channel?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600">{b.channel?.name ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

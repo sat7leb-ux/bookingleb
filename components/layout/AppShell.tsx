@@ -70,12 +70,14 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   const Sidebar = ({ onNav }: { onNav?: () => void }) => (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-white shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
           <span className="text-sm font-bold leading-none text-white">S7</span>
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-fg">SAT<span className="text-accent">-7</span></p>
-          <p className="text-[11px] text-muted">Production Booking</p>
+          <p className="text-sm font-bold text-white">
+            SAT<span className="text-accent">-7</span>
+          </p>
+          <p className="text-[11px] text-slate-400">Production Booking</p>
         </div>
       </div>
 
