@@ -31,7 +31,7 @@ insert into public.locations (id, name, address) values
   ('22222222-2222-2222-2222-222222222203', 'OB Site — Amman', 'Amman Outdoor')
 on conflict (id) do nothing;
 insert into public.locations (id, name, address) values
-  ('22222222-2222-2222-2222-222222222204', 'Remote / Virtual', 'Online')
+  ('22222222-2222-2222-2222-222222222204', 'Outdoor OBVAN', 'OBVAN')
 on conflict (id) do nothing;
 
 -- People
