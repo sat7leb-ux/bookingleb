@@ -38,13 +38,7 @@ export default async function LoginPage({
           <LoginForm next={searchParams.next} />
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-2">
-          Internal tool. New team members are added from{" "}
-          <Link href="/settings" className="text-primary hover:underline">
-            Settings → Users
-          </Link>
-          .
-        </p>
+        
       </div>
     </div>
   );
