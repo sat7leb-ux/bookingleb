@@ -15,7 +15,10 @@ import type {
 export async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await fn();
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[safe] caught query error", error);
+    }
     return fallback;
   }
 }
@@ -109,25 +112,20 @@ export async function getBookings(opts: {
     left join programs pr on pr.id = b.program_id
     left join channels c on c.id = b.channel_id
     left join locations l on l.id = b.location_id
-     left join lateral (
-       select jsonb_agg(jsonb_build_object('id', loc.id, 'name', loc.name)) as locations
-       from booking_locations bl
-       join locations loc on loc.id = bl.location_id
-       where bl.booking_id = b.id
-     ) blocs on true
     left join transportation tr on tr.booking_id = b.id
     left join dress_codes d on d.booking_id = b.id
     ${w}`;
 
-  const { rows: countRows } = await db(`select count(*)::int as n ${base}`, params);
-  const total = (countRows[0] as any)?.n ?? 0;
+  let total = 0;
+  const countResult = await db(`select count(*)::int as n ${base}`, params);
+  total = (countResult.rows[0] as any)?.n ?? 0;
 
   const { rows } = await db<any>(
     `select b.*,
        p.full_name as person_full_name, p.whatsapp as person_whatsapp, p.email as person_email,
        pr.name as program_name,
        c.name as channel_name,
-       l.name as location_name, blocs.locations as location_list,
+       l.name as location_name,
        tr.type as transportation_type,
        d.code as dress_code,
        (select count(*) from public.booking_guests bg where bg.booking_id = b.id) as guest_count,
