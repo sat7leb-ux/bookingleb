@@ -16,7 +16,10 @@ export function BookingsToolbar({
   current: Record<string, string | undefined>;
 }) {
   const router = useRouter();
-  const params = new URLSearchParams(current as Record<string, string>);
+  const params = new URLSearchParams();
+  Object.entries(current).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") params.set(key, value);
+  });
 
   function update(key: string, value: string) {
     if (value && value !== "all") params.set(key, value);
