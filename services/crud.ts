@@ -46,6 +46,12 @@ export async function archivePerson(id: string): Promise<CrudState> {
   return { ok: true, message: "Person archived." };
 }
 
+export async function deletePerson(id: string): Promise<CrudState> {
+  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
+  await db("delete from people where id = $1", [id]);
+  return { ok: true, message: "Person deleted." };
+}
+
 // ---- Programs ----
 export async function upsertProgram(formData: FormData): Promise<CrudState> {
   if (!(await isManager())) return { ok: false, message: "Administrator/Manager access required." };

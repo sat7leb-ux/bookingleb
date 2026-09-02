@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Archive, Search, Users } from "lucide-react";
+import { Plus, Pencil, Archive, Search, Users, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -54,6 +54,19 @@ export function PeopleManager({ people, initial }: { people: any[]; initial?: an
     const res = await fetch("/api/people/archive", { method: "POST", body: fd }).then((r) => r.json());
     if (!res.ok) toast("error", res.message);
     else toast("success", res.message);
+    setArchiveId(null);
+    router.refresh();
+  }
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  async function doDelete() {
+    if (!deleteId) return;
+    const fd = new FormData();
+    fd.append("id", deleteId);
+    const res = await fetch("/api/people", { method: "DELETE", body: fd }).then((r) => r.json());
+    if (!res.ok) toast("error", res.message);
+    else toast("success", res.message);
+    setDeleteId(null);
     router.refresh();
   }
 
@@ -84,6 +97,7 @@ export function PeopleManager({ people, initial }: { people: any[]; initial?: an
                 <div className="flex gap-1">
                   <button onClick={() => openEdit(p)} className="rounded-md p-1.5 text-muted-2 hover:bg-surface-2 hover:text-fg" aria-label="Edit"><Pencil size={14} /></button>
                   <button onClick={() => setArchiveId(p.id)} className="rounded-md p-1.5 text-muted-2 hover:bg-surface-2 hover:text-danger" aria-label="Archive"><Archive size={14} /></button>
+                  <button onClick={() => setDeleteId(p.id)} className="rounded-md p-1.5 text-muted-2 hover:bg-surface-2 hover:text-danger" aria-label="Delete"><Trash2 size={14} /></button>
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -122,6 +136,7 @@ export function PeopleManager({ people, initial }: { people: any[]; initial?: an
       </Modal>
 
       <ConfirmDialog open={!!archiveId} onClose={() => setArchiveId(null)} onConfirm={doArchive} title="Archive person?" message="Archived people are hidden from new bookings but their history is kept." />
+      <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={doDelete} title="Delete person?" message="This permanently deletes this person. This action cannot be undone." danger />
     </div>
   );
 }
