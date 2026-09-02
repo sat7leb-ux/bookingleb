@@ -24,20 +24,15 @@ drop trigger if exists trg_bookings_updated on public.bookings;
 create trigger trg_bookings_updated before update on public.bookings
   for each row execute function public.set_updated_at();
 
--- Safe booking number generator (row-locked counter => concurrency-proof)
--- Format: <PREFIX>-<YYYY>-<NNNNN>
+-- Booking number generator — simple sequential IDs
 create or replace function public.generate_booking_number()
 returns text language plpgsql as $$
 declare
-  v_year integer := extract(year from now());
-  v_prefix text;
   v_counter integer;
   v_result text;
 begin
-  select booking_prefix into v_prefix from public.org_settings limit 1;
-  if v_prefix is null or v_prefix = '' then v_prefix := 'SAT7'; end if;
-
-  insert into public.booking_counters (year, counter) values (v_year, 1)
+  insert into public.booking_counters (year, counter)
+  values (0, 1)
   on conflict (year) do update set counter = booking_counters.counter + 1
   returning counter into v_counter;
 
