@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --bg: 10 10 10;
-  --surface: 18 22 30;
-  --surface-2: 24 30 42;
-  --border: 34 42 58;
-  --border-strong: 50 58 76;
+  --bg: 8 10 20;
+  --surface: 14 20 36;
+  --surface-2: 20 30 52;
+  --border: 28 40 68;
+  --border-strong: 40 56 90;
   --fg: 255 255 255;
-  --muted: 160 170 182;
-  --muted-2: 210 216 224;
+  --muted: 160 175 200;
+  --muted-2: 210 218 232;
   --primary: 59 130 246;
   --primary-fg: 255 255 255;
   --accent: 59 130 246;
@@ -18,7 +18,7 @@
   --warning: 245 158 11;
   --danger: 239 68 68;
   --info: 59 130 246;
-  --violet: 139 92 246;
+  --violet: 99 102 241;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 

@@ -25,6 +25,8 @@ export default async function BookingsPage({
     locations: [],
   });
 
+  const lookupFailed = lookup.people.length === 0 && lookup.programs.length === 0;
+
   const { rows, total } = await getBookings({
     search: searchParams.q,
     status: searchParams.status,
