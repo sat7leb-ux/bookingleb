@@ -70,11 +70,11 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   const Sidebar = ({ onNav }: { onNav?: () => void }) => (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.6)]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
           <span className="text-sm font-bold leading-none text-white">S7</span>
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-fg">SAT<span className="text-primary">-7</span></p>
+          <p className="text-sm font-bold text-fg">SAT<span className="text-accent">-7</span></p>
           <p className="text-[11px] text-muted">Production Booking</p>
         </div>
       </div>
@@ -132,7 +132,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[#05060f] lg:block">
+      <aside className="hidden w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[#0a0a0a] lg:block">
         <Sidebar />
       </aside>
 
@@ -143,7 +143,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-[rgb(var(--border))] bg-[#05060f]">
+          <aside className="absolute left-0 top-0 h-full w-64 border-r border-[rgb(var(--border))] bg-[#0a0a0a]">
             <button
               className="absolute right-3 top-4 text-slate-400 hover:text-white"
               onClick={() => setMobileOpen(false)}
