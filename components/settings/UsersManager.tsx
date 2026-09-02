@@ -107,8 +107,8 @@ export function UsersManager({ users, currentUserId }: { users: Profile[]; curre
           <div key={u.id} className={`card flex flex-wrap items-center gap-3 p-3 ${u.active ? "" : "opacity-50"}`}>
             <Avatar name={u.full_name ?? u.email} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-fg">{u.full_name ?? u.email}</p>
-              <p className="truncate text-xs text-muted">{u.email}{u.active ? "" : " · inactive"}</p>
+              <p className="truncate text-sm font-medium text-white">{u.full_name ?? u.email}</p>
+              <p className="truncate text-xs text-gray-300">{u.email}{u.active ? "" : " · inactive"}</p>
             </div>
             <select
               value={u.role}

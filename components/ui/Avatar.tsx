@@ -20,7 +20,7 @@ export function Avatar({
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-gradient-to-br from-primary/30 to-accent/20 text-fg font-semibold",
+        "inline-flex items-center justify-center rounded-full bg-gradient-to-br from-primary/30 to-accent/20 text-white font-semibold",
         className,
       )}
       style={{ width: size, height: size, fontSize: size * 0.4 }}
