@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --bg: 8 10 20;
-  --surface: 14 20 36;
-  --surface-2: 20 30 52;
-  --border: 28 40 68;
-  --border-strong: 40 56 90;
+  --bg: 6 10 24;
+  --surface: 12 22 44;
+  --surface-2: 18 32 68;
+  --border: 30 48 96;
+  --border-strong: 44 68 128;
   --fg: 255 255 255;
-  --muted: 160 175 200;
-  --muted-2: 210 218 232;
+  --muted: 170 185 210;
+  --muted-2: 220 226 240;
   --primary: 59 130 246;
   --primary-fg: 255 255 255;
-  --accent: 59 130 246;
+  --accent: 96 165 250;
   --success: 52 211 153;
   --warning: 245 158 11;
   --danger: 239 68 68;
