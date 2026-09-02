@@ -54,7 +54,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative w-full glass rounded-2xl shadow-glow animate-scale-in",
+          "relative w-full bg-white rounded-2xl shadow-glow animate-scale-in",
           widths[size],
         )}
       >

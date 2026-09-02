@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import {
   Phone,
   Pencil,
-  Copy,
   XCircle,
-  Printer,
   MessageCircle,
   CheckCircle2,
   RefreshCw,
   X,
   Send,
+  Trash2,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { Modal } from "@/components/ui/Modal";
@@ -43,7 +42,6 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   const [processing, setProcessing] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [dupOpen, setDupOpen] = useState(false);
 
   function buildMessage() {
     const b = { ...booking, requirements, transportation, dress };
@@ -115,43 +113,39 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
     else { toast("success", res.message); router.refresh(); }
   }
 
-  async function doDuplicate() {
-      setProcessing(true);
-      const res = await duplicateBooking(booking.id);
-      setProcessing(false);
-      if (!res.ok) toast("error", res.message);
-      else { toast("success", res.message); router.push(`/bookings/${res.bookingId}`); router.refresh(); }
-    }
-
-    async function doDelete() {
-      setProcessing(true);
-      const res = await fetch(`/api/bookings/${booking.id}`, { method: "DELETE" });
-      const data = await res.json();
-      setProcessing(false);
-      if (!data.ok) toast("error", data.message);
-      else { toast("success", data.message); router.push("/bookings"); router.refresh(); }
-    }
+  async function doDelete() {
+    setProcessing(true);
+    const res = await fetch(`/api/bookings/${booking.id}`, { method: "DELETE" });
+    const data = await res.json();
+    setProcessing(false);
+    if (!data.ok) toast("error", data.message);
+    else { toast("success", data.message); router.push("/bookings"); router.refresh(); }
+  }
 
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center gap-2 print:hidden">
         <StatusBadge status={booking.confirmation_status} />
-        <div className="ml-auto flex flex-wrap gap-2">
-                  <Button variant="ghost" onClick={() => window.print()}><Printer size={15} /> Print</Button>
-                  <Button variant="soft" onClick={openWhatsApp} disabled={processing}><MessageCircle size={15} /> WhatsApp</Button>
-                  {canEdit && (
-                    <Button variant="ghost" onClick={() => router.push(`/bookings/${booking.id}/edit`)}><Pencil size={15} /> Edit</Button>
-                  )}
-                  {canEdit && (
-                    <Button variant="ghost" onClick={() => setDupOpen(true)}><Copy size={15} /> Duplicate</Button>
-                  )}
-                  {canDelete && (
-                    <Button variant="ghost" onClick={() => setConfirmDelete(true)}><XCircle size={15} /> Delete</Button>
-                  )}
-                  {booking.confirmation_status !== "Cancelled" && (
-                    <Button variant="danger" onClick={() => setConfirmCancel(true)}><XCircle size={15} /> Cancel</Button>
-                  )}
-                </div>
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <Button variant="soft" onClick={openWhatsApp} disabled={processing}>
+            <MessageCircle size={15} /> WhatsApp
+          </Button>
+          {canEdit && (
+            <Button variant="ghost" onClick={() => router.push(`/bookings/${booking.id}/edit`)}>
+              <Pencil size={15} /> Edit
+            </Button>
+          )}
+          {canDelete && (
+            <Button variant="ghost" onClick={() => setConfirmDelete(true)}>
+              <Trash2 size={15} /> Delete
+            </Button>
+          )}
+          {booking.confirmation_status !== "Cancelled" && (
+            <Button variant="danger" onClick={() => setConfirmCancel(true)}>
+              <XCircle size={15} /> Cancel
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 print:grid-cols-2">
@@ -296,15 +290,6 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
               message="This permanently deletes the booking and all related data (guests, requirements, transportation, dress code, activity). This action cannot be undone."
               confirmLabel="Delete Booking"
               danger
-            />
-            <ConfirmDialog
-              open={dupOpen}
-              onClose={() => setDupOpen(false)}
-              onConfirm={doDuplicate}
-              title="Duplicate booking?"
-              message="Creates a new pending booking copying all details. You can then edit the date."
-              confirmLabel="Duplicate"
-              danger={false}
             />
     </>
   );

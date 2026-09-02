@@ -50,7 +50,7 @@ export function ConfirmDialog({
             <AlertTriangle size={18} />
           </div>
         )}
-        <p className="text-sm text-muted">{message}</p>
+        <p className="text-sm text-fg">{message}</p>
       </div>
     </Modal>
   );
