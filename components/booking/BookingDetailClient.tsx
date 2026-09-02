@@ -62,7 +62,6 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       requirements?.top_camera ? `*Top Camera:* ${requirements.top_camera} @ ${requirements.top_camera_time ?? "—"}` : "",
       transportation ? `*Transportation:* ${transportation.type}` : "",
       dress ? `*Dress Code:* ${dress.code}` : "",
-      b.extra_notes ? `*Notes:* ${b.extra_notes}` : "",
     ].filter(Boolean);
     return lines.join("\n");
   }
