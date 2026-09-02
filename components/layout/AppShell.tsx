@@ -70,12 +70,12 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   const Sidebar = ({ onNav }: { onNav?: () => void }) => (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.7)]">
-          <Radio size={18} />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-danger text-primary-fg shadow-[0_4px_14px_-4px_rgb(var(--primary)/0.5)]">
+          <span className="text-sm font-bold leading-none text-white">S7</span>
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-bold text-fg">SAT-7</p>
-          <p className="text-[11px] text-muted">Production Booking</p>
+          <p className="text-sm font-bold text-fg">SAT<span className="text-danger">-7</span></p>
+          <p className="text-[11px] text-muted">PROMO DESK</p>
         </div>
       </div>
 
@@ -89,19 +89,19 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
               href={item.href}
               onClick={onNav}
               className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative",
                 active
-                  ? "bg-primary/12 text-fg"
-                  : "text-muted hover:bg-surface-2 hover:text-fg",
+                  ? "bg-surface-2 text-fg"
+                  : "text-muted hover:bg-surface-2/60 hover:text-fg",
               )}
             >
               <Icon
                 size={18}
-                className={cn(active ? "text-primary" : "text-muted-2 group-hover:text-fg")}
+                className={cn(active ? "text-danger" : "text-muted-2 group-hover:text-fg")}
               />
               {item.label}
               {active && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r bg-danger" />
               )}
             </Link>
           );
