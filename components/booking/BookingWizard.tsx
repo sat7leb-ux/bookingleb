@@ -188,7 +188,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       </div>
 
       <div className="card p-5 sm:p-6">
-        <div className="mb-6 flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-2">
+        <div className="mb-6 flex items-center gap-1 overflow-x-auto rounded-xl border-2 border-black bg-surface p-2">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const active = s.id === step;
