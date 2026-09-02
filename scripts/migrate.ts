@@ -8,7 +8,14 @@ if (!url) {
   process.exit(1);
 }
 
-const files = ["supabase/migrations/001_schema.sql", "supabase/migrations/002_functions_rls.sql", "supabase/migrations/003_booking_guests.sql"];
+const files = [
+  "supabase/migrations/001_schema.sql",
+  "supabase/migrations/002_functions_rls.sql",
+  "supabase/migrations/003_booking_guests.sql",
+  "supabase/migrations/004_booking_locations.sql",
+  "supabase/migrations/005_clean_booking_numbers.sql",
+  "supabase/migrations/006_fix_booking_numbers.sql",
+];
 const pool = new Pool({ connectionString: url });
 
 async function run() {

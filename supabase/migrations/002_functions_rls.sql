@@ -24,7 +24,7 @@ drop trigger if exists trg_bookings_updated on public.bookings;
 create trigger trg_bookings_updated before update on public.bookings
   for each row execute function public.set_updated_at();
 
--- Booking number generator — simple sequential IDs
+-- Booking number generator — format: SAT7-2026-XXXXX
 create or replace function public.generate_booking_number()
 returns text language plpgsql as $$
 declare
@@ -36,7 +36,7 @@ begin
   on conflict (year) do update set counter = booking_counters.counter + 1
   returning counter into v_counter;
 
-  v_result := lpad(v_counter::text, 3, '0');
+  v_result := 'SAT7-2026-' || lpad(v_counter::text, 5, '0');
   return v_result;
 end; $$;
 
