@@ -3,15 +3,6 @@ const path = 'app/globals.css';
 let content = fs.readFileSync(path, 'utf8');
 
 content = content.replace(
-  `  --bg: 11 18 32;           /* Dark Blue #0B1220 */
-  --surface: 17 24 42;      /* Dark Blue #11182A */
-  --surface-2: 26 35 56;    /* Dark Blue #1A2338 */
-  --surface-3: 30 41 66;    /* Dark Blue #1E2942 */
-  --border: 41 54 80;       /* Dark Blue #293650 */
-  --border-strong: 56 70 100; /* #384664 */
-  --fg: 240 245 255;        /* Near white */
-  --muted: 140 160 190;     /* Muted blue-gray */
-  --muted-2: 90 110 140;    /* Darker muted */`,
   `  --bg: 30 35 50;           /* Dark slate #1E2332 */
   --surface: 45 50 65;      /* Slate #2D3241 */
   --surface-2: 60 65 82;    /* Slate #3C4152 */
@@ -20,8 +11,17 @@ content = content.replace(
   --border-strong: 130 135 155; /* #82879B */
   --fg: 245 247 250;        /* White */
   --muted: 165 175 195;     /* Light gray-blue */
-  --muted-2: 120 130 155;   /* Medium gray-blue */`
+  --muted-2: 120 130 155;   /* Medium gray-blue */`,
+  `  --bg: 60 65 80;           /* Light slate #3C4150 */
+  --surface: 85 90 110;      /* Light slate #555A6E */
+  --surface-2: 120 125 145;  /* Light slate #787D91 */
+  --surface-3: 155 160 180;  /* Light slate #9BA0B4 */
+  --border: 190 195 215;     /* Light gray #BEC3D7 */
+  --border-strong: 215 218 235; /* #D7DAEB */
+  --fg: 250 251 253;         /* Near white */
+  --muted: 170 175 195;      /* Light gray */
+  --muted-2: 140 145 170;    /* Medium gray */`
 );
 
 fs.writeFileSync(path, content);
-console.log('Lightened dark theme colors');
+console.log('Lightened dark theme with more white and gray');
