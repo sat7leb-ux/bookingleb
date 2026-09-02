@@ -128,6 +128,7 @@ export interface Booking {
   episode_number: string | null;
   recorded_episodes_count: number | null;
   location_id: string | null;
+  location_ids: string[];
   extra_notes: string | null;
   confirmation_status: ConfirmationStatus;
   created_by: string | null;
@@ -138,6 +139,7 @@ export interface Booking {
   program?: Pick<Program, "id" | "name"> | null;
   channel?: Pick<Channel, "id" | "name"> | null;
   location?: Pick<Location, "id" | "name"> | null;
+  locations?: Pick<Location, "id" | "name">[];
 }
 
 export interface BookingActivity {
