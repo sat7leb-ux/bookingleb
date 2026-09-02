@@ -76,6 +76,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
     episode_number: initial?.episode_number ?? null,
     recorded_episodes_count: initial?.recorded_episodes_count ?? null,
     location_id: initial?.location_id ?? null,
+    location_ids: [],
     extra_notes: initial?.extra_notes ?? null,
     requirements: initial?.requirements ?? {},
     transportation: initial?.transportation ?? { type: "Car" },
@@ -96,6 +97,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         ...f,
         channel_id: p.channel_id ?? f.channel_id,
         location_id: f.location_id ?? null,
+    location_ids: f.location_ids ?? [],
         requirements: {
           ...f.requirements,
           place_in: f.requirements?.place_in || p.default_place_in || "",
@@ -356,10 +358,11 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
               <div>
                 <label className="label">Location</label>
                 <SearchableSelect
+                  multiple
                   options={locations.map((l) => ({ value: l.id, label: l.name, sub: l.address ?? "" }))}
-                  value={form.location_id}
-                  onChange={(v) => set("location_id", v)}
-                  placeholder="Select location"
+                  value={form.location_ids ?? []}
+                  onChange={(v) => set("location_ids", v)}
+                  placeholder="Select locations"
                   allowCreate
                   createLabel="Add location"
                   onCreate={(name) => {
@@ -367,7 +370,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                     fd.append("name", name);
                     fetch("/api/locations", { method: "POST", body: fd }).then(async (r) => {
                       const json = await r.json();
-                      if (json.ok) { router.refresh(); set("location_id", json.id); toast("success", "Location added."); }
+                      if (json.ok) { router.refresh(); toast("success", "Location added."); }
                     });
                   }}
                 />
@@ -495,7 +498,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 7 && (
           <div className="space-y-4">
             <h2 className="text-base font-semibold text-fg">Review & Confirmation</h2>
-            <ReviewBlock form={form} personName={selectedGuests[0]?.full_name} programName={selectedProgram?.name} channelName={channels.find((c) => c.id === form.channel_id)?.name} locationName={locations.find((l) => l.id === form.location_id)?.name} />
+            <ReviewBlock form={form} personName={selectedGuests[0]?.full_name} programName={selectedProgram?.name} channelName={channels.find((c) => c.id === form.channel_id)?.name} locationNames={(form.location_ids ?? []).map((lid) => locations.find((l) => l.id === lid)?.name).filter(Boolean).join(", ") || "—"} />
             {conflict.conflict && (
               <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
                 <AlertTriangle size={18} className="mt-0.5" /> {conflict.reason}
@@ -535,13 +538,13 @@ function ReviewBlock({
   personName,
   programName,
   channelName,
-  locationName,
+  locationNames,
 }: {
   form: BookingInput;
   personName?: string;
   programName?: string;
   channelName?: string;
-  locationName?: string;
+  locationNames?: string;
 }) {
   const rows: [string, string | null][] = [
     ["Guest", personName ?? "—"],
@@ -552,7 +555,7 @@ function ReviewBlock({
     ["Start / End", `${form.start_time ?? "—"} / ${form.end_time ?? "—"}`],
     ["Live / Recorded", form.live_recorded],
     ["Episode", form.episode_number ?? "—"],
-    ["Location", locationName ?? "—"],
+    ["Location", locationNames ?? "—"],
     ["Transportation", form.transportation?.type ?? "—"],
     ["Dress code", form.dress_code?.code ?? "—"],
   ];

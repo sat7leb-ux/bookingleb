@@ -17,6 +17,7 @@ export interface BookingInput {
   episode_number: string | null;
   recorded_episodes_count: number | null;
   location_id: string | null;
+  location_ids: string[];
   extra_notes: string | null;
   guest_ids?: string[];
   requirements?: {
@@ -127,6 +128,10 @@ export async function createBooking(input: BookingInput): Promise<BookingFormSta
   await upsertChildren(id, input);
   await upsertGuests(id, input, user.id);
   await db("insert into booking_activity (booking_id, actor_id, action, description) values ($1,$2,'Booking created',$3)", [id, user.id, `Booking created by ${user.full_name || user.email}`]);
+  if (input.location_ids?.length) {
+    const vals = input.location_ids.map((lid, idx) => `($1, $${idx + 2})`).join(", ");
+    await db(`insert into booking_locations (booking_id, location_id) values ${vals} on conflict do nothing`, [id, ...input.location_ids]);
+  }
   return { ok: true, message: "Booking created successfully.", bookingId: id };
 }
 
@@ -140,6 +145,12 @@ export async function updateBooking(id: string, input: BookingInput): Promise<Bo
      where id=$13`,
     [input.person_id, input.program_id, input.channel_id, input.production_date, input.call_time, input.start_time, input.end_time, input.live_recorded, input.episode_number, input.recorded_episodes_count, input.location_id, input.extra_notes, id],
   );
+  const existingLocs = (await db<{location_id: string}>("select location_id from booking_locations where booking_id=$1", [id])).rows;
+  const keep = new Set(input.location_ids ?? []);
+  const toRemove = existingLocs.filter((r) => !keep.has(r.location_id));
+  const toAdd = (input.location_ids ?? []).filter((lid) => !existingLocs.some((r) => r.location_id === lid));
+  for (const r of toRemove) await db("delete from booking_locations where booking_id=$1 and location_id=$2", [id, r.location_id]);
+  for (const lid of toAdd) await db("insert into booking_locations (booking_id, location_id) values ($1,$2) on conflict do nothing", [id, lid]);
   await upsertChildren(id, input);
   await upsertGuests(id, input, user.id);
   await db("insert into booking_activity (booking_id, actor_id, action, description) values ($1,$2,'Booking updated',$3)", [id, user.id, `Booking updated by ${user.full_name || user.email}`]);
@@ -159,7 +170,7 @@ export async function duplicateBooking(id: string): Promise<BookingFormState> {
       production_date: s.production_date, call_time: s.call_time, start_time: s.start_time,
       end_time: s.end_time, live_recorded: s.live_recorded, episode_number: s.episode_number,
       recorded_episodes_count: s.recorded_episodes_count, location_id: s.location_id,
-      extra_notes: s.extra_notes,
+      extra_notes: s.extra_notes, location_ids: [],
     },
     user.id,
   );
