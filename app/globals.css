@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --bg: 8 10 22;
-  --surface: 16 22 42;
-  --surface-2: 24 34 64;
-  --border: 36 50 90;
-  --border-strong: 52 70 120;
+  --bg: 10 12 26;
+  --surface: 18 24 48;
+  --surface-2: 26 36 70;
+  --border: 38 52 100;
+  --border-strong: 56 72 130;
   --fg: 255 255 255;
-  --muted: 170 182 210;
-  --muted-2: 220 226 242;
-  --primary: 59 130 246;
+  --muted: 180 190 220;
+  --muted-2: 230 234 246;
+  --primary: 239 68 68;
   --primary-fg: 255 255 255;
-  --accent: 239 68 68;
+  --accent: 59 130 246;
   --success: 52 211 153;
   --warning: 245 158 11;
   --danger: 239 68 68;
@@ -37,25 +37,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-@layer base {
-  ::selection {
-    background: rgb(var(--primary) / 0.35);
-  }
-  :focus-visible {
-    outline: 2px solid rgb(var(--primary));
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+::selection {
+  background: rgb(var(--primary) / 0.35);
 }
 
-@layer components {
-  .btn-primary {
-    @apply inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--primary))] px-3.5 py-2.5 text-sm font-medium text-[rgb(var(--primary-fg))] shadow-sm hover:brightness-110 active:scale-[0.98];
-  }
-  .btn-ghost {
-    @apply inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] hover:bg-[rgb(var(--surface-2))];
-  }
-  .card {
-    @apply rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] shadow-sm;
-  }
+:focus-visible {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::backdrop {
+  background: rgb(var(--bg));
 }
