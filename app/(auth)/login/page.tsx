@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { isDbConfigured } from "@/lib/config";
 import { LoginForm } from "./LoginForm";
 
 export const metadata = { title: "Sign in — SAT-7 Production Booking" };
@@ -30,11 +29,6 @@ export default async function LoginPage({
         </div>
 
         <div className="card p-6">
-          {!isDbConfigured() && (
-            <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
-              Database is not configured. Set <code>DATABASE_URL</code> in <code>.env.local</code> to enable auth.
-            </div>
-          )}
           <LoginForm next={searchParams.next} />
         </div>
 

@@ -4,13 +4,13 @@
 
 :root {
   --bg: 10 10 10;
-  --surface: 20 20 25;
-  --surface-2: 30 34 45;
-  --border: 40 44 56;
-  --border-strong: 60 64 76;
+  --surface: 18 22 30;
+  --surface-2: 24 30 42;
+  --border: 34 42 58;
+  --border-strong: 50 58 76;
   --fg: 255 255 255;
-  --muted: 160 170 180;
-  --muted-2: 200 210 220;
+  --muted: 160 170 182;
+  --muted-2: 210 216 224;
   --primary: 59 130 246;
   --primary-fg: 255 255 255;
   --accent: 59 130 246;
