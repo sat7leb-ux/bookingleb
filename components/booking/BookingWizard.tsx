@@ -188,6 +188,45 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       </div>
 
       <div className="card p-5 sm:p-6">
+        <div className="mb-6 flex items-center gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-2">
+          {STEPS.map((s, i) => {
+            const Icon = s.icon;
+            const active = s.id === step;
+            const done = s.id < step;
+            return (
+              <div key={s.id} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setStep(s.id)}
+                  className={cn(
+                    "group flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                    active
+                      ? "bg-surface-2 text-fg"
+                      : done
+                        ? "text-primary"
+                        : "text-muted hover:text-fg",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-7 w-7 items-center justify-center rounded-md text-xs",
+                      active
+                        ? "bg-primary text-primary-fg"
+                        : done
+                          ? "bg-primary/15 text-primary"
+                          : "bg-surface text-muted",
+                    )}
+                  >
+                    {done ? <CheckCircle2 size={14} /> : <Icon size={14} />}
+                  </span>
+                  <span className="hidden text-xs font-medium sm:inline">{s.label}</span>
+                </button>
+                {i < STEPS.length - 1 && <div className="mx-1 h-4 w-px bg-border/70" />}
+              </div>
+            );
+          })}
+        </div>
+
         {step === 1 && (
           <div className="space-y-5">
             <div>
@@ -501,22 +540,6 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             )}
           </div>
         </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          {STEPS.map((s, i) => {
-            const active = s.id === step;
-            const done = s.id < step;
-            return (
-              <div key={s.id} className="flex items-center">
-                <span className={cn("h-2 w-2 rounded-full", done ? "bg-primary" : active ? "bg-primary" : "bg-border")} />
-                {i < STEPS.length - 1 && <div className="mx-1 h-px w-6 bg-border/70" />}
-              </div>
-            );
-          })}
-        </div>
-        <span className="text-xs text-muted">Step {step} of {STEPS.length}</span>
       </div>
     </div>
   );
