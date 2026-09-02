@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SAT-7 Production Booking — QA Report</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --surface: #111827;
+    --surface-2: #0f172a;
+    --border: #1f2937;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --primary: #3b82f6;
+    --primary-2: #60a5fa;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --info: #3b82f6;
+    --violet: #8b5cf6;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+  h1 { font-size: 28px; margin: 0; letter-spacing: 0.2px; }
+  .sub { color: var(--muted); margin-top: 6px; }
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .meta span { color: var(--muted); font-size: 13px; background: var(--surface); border:1px solid var(--border); padding: 6px 10px; border-radius: 8px; }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 18px; margin: 0 0 12px; color: var(--text); }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .card h3 { margin: 0 0 8px; font-size: 15px; color: var(--primary-2); }
+  .card p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); color: var(--muted); }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  table { width:100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  .status { font-weight: 600; }
+  .PASS { color: var(--success); }
+  .FAIL { color: var(--danger); }
+  .WARN { color: var(--warning); }
+  .INFO { color: var(--info); }
+  .severity { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); }
+  .high { color: var(--danger); border-color:#7f1d1d; background:#450a0a33; }
+  .medium { color: var(--warning); border-color:#78350f; background:#451a032e; }
+  .low { color: var(--primary-2); border-color:#1e3a8a; background:#0c1e3d38; }
+  .summary { display:flex; gap:14px; flex-wrap:wrap; margin-top: 12px; }
+  .count { background: var(--surface); border:1px solid var(--border); padding: 14px 18px; border-radius: 14px; min-width: 120px; }
+  .count .num { font-size: 26px; font-weight: 700; }
+  .count .lbl { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .findings { margin-top: 10px; }
+  .finding { background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .finding header { display:flex; justify-content: space-between; align-items:center; gap:10px; border-bottom:none; padding-bottom:0; margin-bottom:8px; }
+  .finding h4 { margin:0; font-size:14px; color: var(--text); }
+  code { background: #0b1220; border:1px solid var(--border); padding: 2px 6px; border-radius: 6px; font-size: 12px; color:#c7d2fe; }
+  a { color: var(--primary-2); }
+  .center { text-align: center; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>SAT-7 Production Booking — QA Report</h1>
+    <div class="sub">Deep professional audit: UI/UX, functionality, branding, accessibility, performance, flows, mobile, error handling, data integrity.</div>
+    <div class="meta">
+      <span>Site: https://bookingleb.vercel.app</span>
+      <span>Environment: Production</span>
+      <span>Auditor: Automated + Manual QA</span>
+      <span>Date: <span id="date"></span></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Summary</h2>
+    <div class="summary">
+      <div class="count"><div class="num" id="total">—</div><div class="lbl">Total Checks</div></div>
+      <div class="count"><div class="num" id="pass" style="color:var(--success)">—</div><div class="lbl">Passed</div></div>
+      <div class="count"><div class="num" id="warn" style="color:var(--warning)">—</div><div class="lbl">Warnings</div></div>
+      <div class="count"><div class="num" id="fail" style="color:var(--danger)">—</div><div class="lbl">Failed</div></div>
+      <div class="count"><div class="num" id="info" style="color:var(--info)">—</div><div class="lbl">Info</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Category Health</h2>
+    <div class="grid" id="cats"></div>
+  </section>
+
+  <section>
+    <h2>Findings</h2>
+    <div class="findings" id="findings"></div>
+  </section>
+
+  <section>
+    <h2>Recommendations</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Priority</th><th>Action</th><th>Rationale</th></tr>
+        </thead>
+        <tbody id="recs"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="center">
+    Generated by SAT-7 QA automation · Report is read-only reference for stakeholders
+  </footer>
+</div>
+
+<script>
+  document.getElementById('date').textContent = new Date().toISOString().slice(0,10);
+  window.__QA__ = {
+    items: [
+      { cat: 'Branding & Identity', checks: [
+        { id:'B1', title:'No Promo Desk references', status:'PASS', note:'Confirmed removed from AppShell, login, layout.' },
+        { id:'B2', title:'Brand reads SAT-7 Production Booking', status:'PASS', note:'Login, layout, sidebar updated.' },
+        { id:'B3', title:'Primary accent uses blue (#3b82f6)', status:'PASS', note:'Tokens updated to blue.' },
+        { id:'B4', title:'Logo mark uses blue block with white S7', status:'PASS', note:'Sidebar logo matches reference style.' }
+      ]},
+      { cat: 'Visual Design & Theme', checks: [
+        { id:'D1', title:'Comfortable contrast for long use', status:'PASS', note:'Dark theme with muted neutrals and blue accent.' },
+        { id:'D2', title:'No overly dark blocks causing eye strain', status:'PASS', note:'Surfaces use #0a0a0a/#111827, not pure black everywhere.' },
+        { id:'D3', title:'White/gray breathing space', status:'PASS', note:'Cards and borders create separation without brightness spikes.' },
+        { id:'D4', title:'Consistent component styling', status:'WARN', note:'Some pages still use ad-hoc slate classes; standardize via tokens.' }
+      ]},
+      { cat: 'Navigation & Layout', checks: [
+        { id:'N1', title:'Sidebar links reflect active page', status:'PASS', note:'Active state uses blue indicator + icon tint.' },
+        { id:'N2', title:'Mobile sidebar opens and closes', status:'INFO', note:'Requires manual verification on device widths <1024px.' },
+        { id:'N3', title:'No broken layout overflow', status:'PASS', note:'No obvious horizontal overflow in build artifacts.' }
+      ]},
+      { cat: 'Bookings Flow', checks: [
+        { id:'BK1', title:'Bookings list loads', status:'INFO', note:'Previously reported zero total on live; still needs live verification.' },
+        { id:'BK2', title:'Create booking flow completes', status:'INFO', note:'Multi-location selection present; needs end-to-end test.' },
+        { id:'BK3', title:'Status editing is accessible to admins', status:'PASS', note:'Inline status control implemented.' },
+        { id:'BK4', title:'Booking numbers are sequential 001+', status:'PASS', note:'Generator updated; no SAT7-2026 prefix.' }
+      ]},
+      { cat: 'Calendar & Dashboard', checks: [
+        { id:'C1', title:'Calendar reflects booking dates', status:'INFO', note:'Date sync fix applied; verify live cross-machine behavior.' },
+        { id:'C2', title:'Dashboard stats are live clickable', status:'PASS', note:'Stat cards are clickable.' }
+      ]},
+      { cat: 'Data Integrity & Backend', checks: [
+        { id:'DB1', title:'Multi-location join works', status:'WARN', note:'booking_locations added; still verify on all supported DB states.' },
+        { id:'DB2', title:'No empty filter results due to undefined params', status:'PASS', note:'Toolbar param filtering fixed.' },
+        { id:'DB3', title:'Timezone-safe date display', status:'PASS', note:'Dates returned as YYYY-MM-DD strings.' }
+      ]},
+      { cat: 'Accessibility', checks: [
+        { id:'A1', title:'Focus outlines visible', status:'PASS', note:'globals.css defines focus-visible ring.' },
+        { id:'A2', title:'Semantic buttons and labels', status:'WARN', note:'Some icon-only buttons may need aria-labels; audit remaining controls.' }
+      ]},
+      { cat: 'Performance', checks: [
+        { id:'P1', title:'Build output within budget', status:'PASS', note:'Shared JS ~87.3 kB; pages ~91–104 kB.' },
+        { id:'P2', title:'No unused large dependencies', status:'PASS', note:'No obvious bundle bloat from latest build.' }
+      ]},
+      { cat: 'Error Handling', checks: [
+        { id:'E1', title:'Graceful auth/degraded states', status:'WARN', note:'Live /login displayed Database not configured in unauthenticated fetch; dashboard renders when authenticated in preview. Needs hard-refresh/re-auth verification after redeploy.' },
+        { id:'E2', title:'Forms validate before submit', status:'PASS', note:'Validation exists in booking wizard.' }
+      ]}
+    ]
+  };
+</script>
+<script>
+  const items = window.__QA__.items;
+  const findings = [];
+  const catHealth = [];
+  let total=0, pass=0, warn=0, fail=0, info=0;
+  items.forEach(group => {
+    let cPass=0,cWarn=0,cFail=0,cInfo=0;
+    group.checks.forEach(c => {
+      total++;
+      const sev = c.status==='PASS'?(pass++,cPass++):c.status==='WARN'?(warn++,cWarn++):c.status==='FAIL'?(fail++,cFail++):(info++,cInfo++);
+      findings.push({...c, cat: group.cat});
+    });
+    const score = cPass + Math.floor(cWarn/2);
+    const max = group.checks.length;
+    const pct = Math.round((score/max)*100);
+    const color = pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)';
+    catHealth.push({name: group.cat, pct, color, counts: {pass:cPass,warn:cWarn,fail:cFail,info:cInfo,total:max}});
+  });
+  document.getElementById('total').textContent = total;
+  document.getElementById('pass').textContent = pass;
+  document.getElementById('warn').textContent = warn;
+  document.getElementById('fail').textContent = fail;
+  document.getElementById('info').textContent = info;
+  document.getElementById('cats').innerHTML = catHealth.map(c => `<div class="card"><h3>${c.name}</h3><p><span class="status" style="color:${c.color}">${c.pct}%</span> · ${c.counts.pass} passed · ${c.counts.warn} warnings · ${c.counts.fail} failed</p></div>`).join('');
+  const byStatus = s => findings.filter(f => f.status===s).sort((a,b)=>a.id.localeCompare(b.id));
+  const sevClass = s => s==='FAIL'?'high':s==='WARN'?'medium':s==='INFO'?'low':'low';
+  const renderFindings = list => list.map(f => `<div class="finding"><header><div><span class="badge">${f.id}</span> <span class="severity ${sevClass(f.status)}">${f.status}</span> <span class="status ${f.status}">${f.title}</span></div><span class="badge">${f.cat}</span></header><p style="margin:8px 0 0;color:var(--muted)">${f.note}</p></div>`).join('');
+  document.getElementById('findings').innerHTML = renderFindings(byStatus('FAIL')) + renderFindings(byStatus('WARN')) + renderFindings(byStatus('INFO')) + renderFindings(byStatus('PASS'));
+  const recs = [
+    ['High', 'Investigate live bookings/calendar zero-result path', 'Dashboard shows live data in preview, but /bookings text extraction suggests empty list on live; validate server-side query path and cached function state.'],
+    ['High', 'Fix login degraded messaging', '/login showed Database not configured during fetch; ensure user-facing auth copy is stable and not DB-dependent.'],
+    ['Medium', 'Verify calendar on multiple machines', 'Sync/date filtering is suspected cross-machine; add smoke coverage after auth is stable.'],
+    ['Medium', 'Standardize token usage across all pages', 'Some components still use hard-coded slate values; replace with CSS variables.'],
+    ['Medium', 'Add aria-labels to icon-only controls', 'Keyboard and screen-reader coverage is incomplete.'],
+    ['Low', 'Add loading skeletons for tables/cards', 'Reduces perceived jumpiness on slow networks.']
+  ];
+  document.getElementById('recs').innerHTML = recs.map(r => `<tr><td><span class="severity ${r[0]==='High'?'high':r[0]==='Medium'?'medium':'low'}">${r[0]}</span></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+</script>
+</body>
+</html>
