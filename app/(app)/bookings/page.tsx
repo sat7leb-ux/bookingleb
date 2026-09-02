@@ -44,10 +44,10 @@ export default async function BookingsPage({
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-fg">Bookings</h1>
-          <p className="mt-1 text-sm text-muted">{total} total · page {page}</p>
+          <h1 className="page-title">Bookings</h1>
+          <p className="page-subtitle">{total} total · page {page}</p>
         </div>
         <div className="flex gap-2">
           {canCreate && (
@@ -87,20 +87,20 @@ export default async function BookingsPage({
                 </tr>
               )}
               {rows.map((b: any) => (
-                <tr key={b.id} className="border-b border-gray-200 hover:bg-gray-50">
+                <tr key={b.id} className="border-b border-border hover:bg-surface-2">
                   <td className="px-4 py-3">
                     <Link href={`/bookings/${b.id}`} className="font-medium text-accent hover:underline">
                       {b.booking_number}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{b.person?.full_name ?? b.guest_name ?? "—"}</div>
-                    <div className="text-xs text-gray-500">{b.person?.organization ?? b.organization ?? ""}</div>
+                    <div className="font-medium text-fg">{b.person?.full_name ?? b.guest_name ?? "—"}</div>
+                    <div className="text-xs text-muted">{b.person?.organization ?? b.organization ?? ""}</div>
                   </td>
-                  <td className="px-4 py-3 text-gray-900">{b.program?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-gray-600">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
+                  <td className="px-4 py-3 text-fg">{b.program?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
                   <td className="px-4 py-3"><StatusSelect bookingId={b.id} current={b.confirmation_status} canChange={canChange} /></td>
-                  <td className="px-4 py-3 text-gray-600">{b.channel?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted">{b.channel?.name ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

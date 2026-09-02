@@ -13,9 +13,11 @@ export default async function ProgramsPage() {
   ]);
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">Programs</h1>
-        <p className="mt-1 text-sm text-muted">Programs carry default production settings applied to new bookings.</p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Programs</h1>
+          <p className="page-subtitle">Programs carry default production settings applied to new bookings.</p>
+        </div>
       </div>
       {!programs.length ? (
         <EmptyState icon={<Clapperboard size={22} />} title="Supabase not connected" description="Configure Supabase to manage programs." />

@@ -10,9 +10,11 @@ export default async function PeoplePage() {
   const people = await safe(() => getPeopleWithStats(), []);
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">People</h1>
-        <p className="mt-1 text-sm text-muted">Guests and contacts used across production bookings.</p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">People</h1>
+          <p className="page-subtitle">Contacts and participants used across production bookings.</p>
+        </div>
       </div>
       {!people.length ? (
         <EmptyState icon={<Users size={22} />} title="Supabase not connected" description="Configure Supabase to manage people." />

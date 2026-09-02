@@ -13,11 +13,11 @@ export default async function UsersPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">Users</h1>
-        <p className="mt-1 text-sm text-muted">
-          Manage organization members and their roles and permissions.
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Users</h1>
+          <p className="page-subtitle">Manage organization members and their roles and permissions.</p>
+        </div>
       </div>
       <Card className="p-5">
         {admin ? (

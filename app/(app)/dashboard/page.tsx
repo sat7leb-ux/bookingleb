@@ -43,13 +43,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="page-header">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-fg">Production Dashboard</h1>
-            <RealtimeBadge table="bookings" />
-          </div>
-          <p className="mt-1 text-sm text-muted">Live overview of all production bookings.</p>
+          <h1 className="page-title">Production Dashboard</h1>
+          <p className="page-subtitle">Live overview of all production bookings.</p>
         </div>
         <Link href="/bookings/new" className="btn-primary">
           <Plus size={16} /> Create Booking

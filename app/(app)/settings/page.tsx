@@ -19,9 +19,11 @@ export default async function SettingsPage() {
   ]);
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">Settings</h1>
-        <p className="mt-1 text-sm text-muted">Organization, channels, locations, users and permissions.</p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">Organization, channels, locations, users and permissions.</p>
+        </div>
       </div>
       {!settings && !channels.length && !profiles.length ? (
         <EmptyState icon={<SettingsIcon size={22} />} title="Supabase not connected" description="Configure Supabase to access settings." />

@@ -13,9 +13,11 @@ export default async function CalendarPage() {
   );
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">Calendar</h1>
-        <p className="mt-1 text-sm text-muted">Production schedule across month, week and day views.</p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Calendar</h1>
+          <p className="page-subtitle">Production schedule across month, week and day views.</p>
+        </div>
       </div>
       {rows.length === 0 ? (
         <EmptyState icon={<Radio size={22} />} title="No bookings yet" description="Create a booking to see it on the calendar." />
