@@ -49,8 +49,8 @@ export function SettingsTabs({ settings, channels, locations, users, currentUser
               key={t.id}
               onClick={() => setTab(t.id)}
               className={cn(
-                "flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors",
-                tab === t.id ? "border-primary text-fg" : "border-transparent text-muted-2 hover:text-fg",
+                "inline-flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors",
+                tab === t.id ? "border-primary text-fg" : "border-transparent text-muted hover:text-fg",
               )}
             >
               <Icon size={15} /> {t.label}

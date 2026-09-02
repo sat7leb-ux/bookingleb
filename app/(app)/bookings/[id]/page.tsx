@@ -22,12 +22,14 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
 
   return (
     <div className="space-y-5">
-      <div className="print:hidden">
-        <Link href="/bookings" className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
-          <ArrowLeft size={15} /> Back to bookings
-        </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-fg">{data.guests?.[0]?.full_name ?? data.booking.person?.full_name ?? "Booking"}</h1>
-        <p className="font-mono text-xs text-muted">{data.booking.booking_number}</p>
+      <div className="page-header print:hidden">
+        <div>
+          <Link href="/bookings" className="text-sm text-muted hover:text-fg inline-flex items-center gap-1">
+            <ArrowLeft size={15} /> Back to bookings
+          </Link>
+          <h1 className="page-title">{data.booking.person?.full_name ?? "Booking"}</h1>
+          <p className="font-mono text-xs text-muted">{data.booking.booking_number}</p>
+        </div>
       </div>
 
       <BookingDetailClient
