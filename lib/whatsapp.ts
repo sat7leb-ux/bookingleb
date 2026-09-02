@@ -46,12 +46,8 @@ export function buildWhatsappMessage(b: Booking & {
     lines.push(`*Dress Code:* ${b.dress.code}`);
     if (b.dress.notes) lines.push(`• ${b.dress.notes}`);
   }
-  if (b.extra_notes) {
-    lines.push(``);
-    lines.push(`*Notes:* ${b.extra_notes}`);
-  }
   lines.push(``);
-  lines.push(`*Please confirm your availability:*`);
+  lines.push(`*Please confirm your availability, ${b.person?.full_name ?? ""}:*`);
   lines.push(`✅ Confirm`);
   lines.push(`❌ Decline`);
   lines.push(`📝 Other reason: ...`);
