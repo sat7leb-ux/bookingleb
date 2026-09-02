@@ -113,15 +113,15 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
       <div className="mt-3 flex items-center gap-2.5 rounded-lg px-2 py-1.5">
         <Avatar name={user.full_name} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium text-fg">
+          <p className="truncate text-xs font-medium text-white">
             {user.full_name || user.email}
           </p>
-          <p className="truncate text-[11px] text-muted">{user.role}</p>
+          <p className="truncate text-[11px] text-gray-300">{user.role}</p>
         </div>
         <button
           onClick={signOutUser}
           disabled={signingOut}
-          className="rounded-lg p-1.5 text-muted-2 hover:bg-surface-2 hover:text-danger"
+          className="rounded-lg p-1.5 text-gray-300 hover:bg-surface-2 hover:text-danger"
           aria-label="Sign out"
           title="Sign out"
         >
