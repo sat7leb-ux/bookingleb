@@ -132,7 +132,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-[rgb(var(--border))] bg-[#0a0a0a] lg:block">
+      <aside className="hidden w-64 shrink-0 border-r border-black/10 bg-[#0f172a] lg:block">
         <Sidebar />
       </aside>
 
@@ -140,10 +140,10 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-[rgb(var(--border))] bg-[#0a0a0a]">
+          <aside className="absolute left-0 top-0 h-full w-64 border-r border-black/10 bg-[#0f172a]">
             <button
               className="absolute right-3 top-4 text-slate-400 hover:text-white"
               onClick={() => setMobileOpen(false)}
@@ -158,9 +158,9 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-border bg-surface/50 px-4 py-3 backdrop-blur-xl">
+        <header className="flex items-center gap-3 border-b border-black/10 bg-white/70 px-4 py-3 backdrop-blur-xl">
           <button
-            className="rounded-lg p-2 text-muted-2 hover:bg-surface-2 hover:text-fg lg:hidden"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
@@ -169,12 +169,12 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
           <div className="flex flex-1 items-center gap-2">
             <Search
               size={16}
-              className="text-muted-2"
+              className="text-gray-400"
             />
           </div>
           <button
             onClick={toggleTheme}
-            className="rounded-lg p-2 text-muted-2 hover:bg-surface-2 hover:text-fg"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
             aria-label="Toggle theme"
             title="Toggle theme"
           >
@@ -182,7 +182,7 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
           </button>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-[rgb(var(--bg))]">
           <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </div>

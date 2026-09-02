@@ -180,6 +180,18 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
   return (
     <div className="space-y-5">
+      {/* Header */}
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-fg">New Booking</h1>
+          <p className="mt-1 text-sm text-muted">Complete all steps to create a production booking.</p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-3 py-2 text-xs text-muted">
+          <span className="inline-flex h-2 w-2 rounded-full bg-primary" />
+          Step {step} of {STEPS.length}
+        </div>
+      </div>
+
       {/* Stepper */}
       <div className="flex items-center gap-1 overflow-x-auto rounded-2xl border border-border bg-surface/60 p-2 backdrop-blur">
         {STEPS.map((s, i) => {
@@ -191,32 +203,33 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
               <button
                 onClick={() => setStep(s.id)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                  active ? "bg-primary/15 text-fg" : done ? "text-primary" : "text-muted-2 hover:bg-surface-2",
+                  "group flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm transition-all",
+                  active ? "bg-primary/15 text-fg shadow-sm" : done ? "text-primary" : "text-muted-2 hover:bg-surface-2",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold",
-                    active ? "bg-primary text-primary-fg" : done ? "bg-primary/20 text-primary" : "bg-surface-2 text-muted-2",
+                    "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition-all",
+                    active ? "bg-primary text-primary-fg shadow-lg shadow-primary/25" : done ? "bg-primary/20 text-primary" : "bg-surface-2 text-muted-2 group-hover:text-fg",
                   )}
                 >
-                  {done ? <CheckCircle2 size={15} /> : s.id}
+                  {done ? <CheckCircle2 size={16} /> : <Icon size={16} />}
                 </span>
-                <span className="hidden font-medium sm:inline">{s.label}</span>
+                <span className="hidden text-sm font-medium sm:inline">{s.label}</span>
               </button>
-              {i < STEPS.length - 1 && <ChevronRight size={14} className="text-muted-2/50" />}
+              {i < STEPS.length - 1 && <ChevronRight size={14} className="text-muted-2/50 mx-1" />}
             </div>
           );
         })}
       </div>
-
       <div className="card p-5 sm:p-6">
         {/* STEP 1 — Guests (multiple allowed for the same shooting) */}
         {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Guests / People</h2>
-            <p className="text-xs text-muted">Add everyone taking part in this shooting. The first selected guest is the primary contact.</p>
+          <div className="space-y-5">
+            <div>
+              <h2 className="section-title">Guests / People</h2>
+              <p className="muted mt-1">Add everyone taking part in this shooting. The first selected guest is the primary contact.</p>
+            </div>
             <div>
               <label className="label">Add guests</label>
               <SearchableSelect
@@ -242,24 +255,22 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             </div>
 
             {!form.guest_ids?.length && (
-              <div className="space-y-3 rounded-xl border border-border bg-surface-2/50 p-4">
-                <p className="text-xs font-medium text-muted">New guest details</p>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="card-light p-4">
+                <p className="text-xs font-semibold text-slate-900">New guest details</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input className="input" placeholder="Full name *" value={newPerson.full_name ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, full_name: e.target.value }))} />
                   <input className="input" placeholder="WhatsApp number" value={newPerson.whatsapp ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, whatsapp: e.target.value }))} />
                   <input className="input" placeholder="Email" value={newPerson.email ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, email: e.target.value }))} />
                   <input className="input" placeholder="Company / Organization" value={newPerson.company ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, company: e.target.value }))} />
                   <input className="input" placeholder="Department" value={newPerson.department ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, department: e.target.value }))} />
                 </div>
-                <textarea className="input min-h-[60px]" placeholder="Notes" value={newPerson.notes ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, notes: e.target.value }))} />
+                <textarea className="input mt-3 min-h-[60px]" placeholder="Notes" value={newPerson.notes ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, notes: e.target.value }))} />
               </div>
             )}
             {selectedGuests.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedGuests.map((g, i) => (
-                  <span key={g.id} className="rounded-full border border-border bg-surface-2/40 px-3 py-1 text-xs text-fg">
-                    {g.full_name}{i === 0 ? " · Primary" : ""}
-                  </span>
+                  <span key={g.id} className="badge-primary">{g.full_name}{i === 0 ? " · Primary" : ""}</span>
                 ))}
               </div>
             )}
@@ -268,8 +279,11 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
         {/* STEP 2 — Program */}
         {step === 2 && (
-          <div className="space-y-4">
-            <h2 className="text-base font-semibold text-fg">Program</h2>
+          <div className="space-y-5">
+            <div>
+              <h2 className="section-title">Program</h2>
+              <p className="muted mt-1">Choose the program and channel for this production.</p>
+            </div>
             <div>
               <label className="label">Select program</label>
               <SearchableSelect
@@ -280,7 +294,6 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 allowCreate
                 createLabel="Create program"
                 onCreate={(name) => {
-                  // quick create via api
                   const fd = new FormData();
                   fd.append("name", name);
                   fetch("/api/programs", { method: "POST", body: fd }).then(async (r) => {
@@ -580,6 +593,15 @@ function ReviewBlock({
           <span className="text-fg">{form.extra_notes}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-lg bg-surface-2/40 px-3 py-2 text-sm">
+      <span className="text-muted">{label}</span>
+      <span className="font-medium text-fg">{value}</span>
     </div>
   );
 }
