@@ -171,7 +171,6 @@ export function AppShell({ user, children }: { user: Profile; children: React.Re
               size={16}
               className="text-muted-2"
             />
-            <span className="text-sm text-muted-2">Quick search — press /</span>
           </div>
           <button
             onClick={toggleTheme}
