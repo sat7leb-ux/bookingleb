@@ -4,6 +4,7 @@ export type Role = "Administrator" | "Production Manager" | "Production User" | 
 
 export type ConfirmationStatus =
   | "Pending Confirmation"
+  | "In Progress"
   | "Confirmed"
   | "Declined"
   | "Reschedule Requested"

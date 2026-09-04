@@ -111,16 +111,6 @@ export function ProgramsManager({ programs, channels }: { programs: any[]; chann
             <label className="label">Default location</label>
             <input className={`input ${form.default_location ? "" : "border-danger"}`} value={form.default_location} onChange={(e) => setForm({ ...form, default_location: e.target.value })} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="label">Default Place-In</label>
-              <input className={`input ${form.default_place_in ? "" : "border-danger"}`} value={form.default_place_in} onChange={(e) => setForm({ ...form, default_place_in: e.target.value })} />
-            </div>
-            <div>
-              <label className="label">Default Top Camera</label>
-              <input className={`input ${form.default_top_camera ? "" : "border-danger"}`} value={form.default_top_camera} onChange={(e) => setForm({ ...form, default_top_camera: e.target.value })} />
-            </div>
-          </div>
           <div>
             <label className="label">Notes</label>
             <textarea className={`input min-h-[60px] ${form.notes ? "" : "border-danger"}`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />

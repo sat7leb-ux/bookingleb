@@ -19,6 +19,7 @@ export const ROLES: Role[] = [
 
 export const CONFIRMATION_STATUSES: ConfirmationStatus[] = [
   "Pending Confirmation",
+  "In Progress",
   "Confirmed",
   "Declined",
   "Reschedule Requested",
@@ -55,6 +56,12 @@ export const STATUS_STYLES: Record<
     bg: "bg-warning/12",
     text: "text-warning",
     label: "Pending",
+  },
+  "In Progress": {
+    dot: "bg-blue-500",
+    bg: "bg-blue-500/12",
+    text: "text-blue-500",
+    label: "In Progress",
   },
   Confirmed: {
     dot: "bg-success",
@@ -94,6 +101,7 @@ export const TRANSPORT_ICON: Record<TransportationType, string> = {
 // Status colors for the calendar (hex, for inline style)
 export const STATUS_HEX: Record<ConfirmationStatus, string> = {
   "Pending Confirmation": "#f5a623",
+  "In Progress": "#3b82f6",
   Confirmed: "#34d399",
   Declined: "#f87171",
   "Reschedule Requested": "#a78bfa",
