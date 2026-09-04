@@ -491,7 +491,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
               </div>
               <div>
                 <label className="label">Driver name</label>
-                <input className={`input ${(form.transportation?.driver_name ?? "") === "" ? "border-danger" : ""}`} placeholder="Driver name" value={form.transportation?.driver_name ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), driver_name: e.target.value } as any)} />
+                <input className={`input ${(form.transportation?.driver ?? "") === "" ? "border-danger" : ""}`} placeholder="Driver name" value={form.transportation?.driver ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), driver: e.target.value } as any)} />
               </div>
               <div>
                 <label className="label">Transport note</label>
