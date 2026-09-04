@@ -160,9 +160,13 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       const payload: BookingInput = { ...form, person_id: personId ?? (guestIds.size ? Array.from(guestIds)[0] : null), guest_ids: Array.from(guestIds) };
       let result: any = null;
       try {
-        const response = editMode
-          ? await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, editId: initial.id }) })
-          : await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const editPath = editMode && initial?.id
+          ? `/api/bookings`
+          : `/api/bookings`;
+        const body = editMode && initial?.id
+          ? JSON.stringify({ ...payload, editId: initial.id })
+          : JSON.stringify(payload);
+        const response = await fetch(editPath, { method: "POST", headers: { "Content-Type": "application/json" }, body });
         result = await response.json();
       } catch (err) {
         console.error("[BookingWizard] submit fetch/json error:", err);
