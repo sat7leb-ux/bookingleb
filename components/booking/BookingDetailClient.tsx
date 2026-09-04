@@ -50,6 +50,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
         `*📺 Production Booking Update*`,
         `────────────────────────`,
         `*Booking ID:* ${b.booking_number}`,
+        `*Program:* ${b.program?.name ?? "—"}`,
         `*Status:* Cancelled`,
         ``,
         `This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`,

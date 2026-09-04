@@ -99,7 +99,12 @@ export default async function BookingsPage({
                   </td>
                   <td className="px-4 py-3 text-fg">{b.program?.name ?? "—"}</td>
                   <td className="px-4 py-3 text-muted">{b.production_date ? new Date(b.production_date).toLocaleDateString() : "—"}</td>
-                  <td className="px-4 py-3"><StatusSelect bookingId={b.id} current={b.confirmation_status} canChange={canChange} /></td>
+                  <td className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <StatusSelect bookingId={b.id} current={b.confirmation_status} canChange={canChange} />
+                  <BookingWhatsAppButton booking={b} />
+                </div>
+              </td>
                   <td className="px-4 py-3 text-muted">{b.channel?.name ?? "—"}</td>
                 </tr>
               ))}

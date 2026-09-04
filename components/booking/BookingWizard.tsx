@@ -254,6 +254,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 allowCreate
                 createLabel="Create person"
                 onCreate={(name) => setNewPerson({ full_name: name })}
+                className={(!form.guest_ids || form.guest_ids.length === 0) && !newPerson.full_name ? "border-danger" : ""}
               />
             </div>
 
@@ -261,7 +262,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
               <div className="rounded-xl border border-border bg-surface-2/40 p-4">
                 <p className="text-sm font-medium text-fg">New person details</p>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <input className="input" placeholder="Full name *" value={newPerson.full_name ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, full_name: e.target.value }))} />
+                  <input className={`input ${newPerson.full_name ? "" : "border-danger"}`} placeholder="Full name *" value={newPerson.full_name ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, full_name: e.target.value }))} />
                   <input className="input" placeholder="WhatsApp number" value={newPerson.whatsapp ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, whatsapp: e.target.value }))} />
                   <input className="input" placeholder="Email" value={newPerson.email ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, email: e.target.value }))} />
                   <input className="input" placeholder="Company / Organization" value={newPerson.company ?? ""} onChange={(e) => setNewPerson((p) => ({ ...p, company: e.target.value }))} />
@@ -307,6 +308,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                     }
                   });
                 }}
+                className={!form.program_id ? "border-danger" : ""}
               />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -370,31 +372,32 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="label">Production date *</label>
-                <input type="date" className="input" value={form.production_date ?? ""} onChange={(e) => { set("production_date", e.target.value); setConflict({ conflict: false }); }} onBlur={checkConflict} />
+                <input type="date" className={`input ${form.production_date ? "" : "border-danger"}`} value={form.production_date ?? ""} onChange={(e) => { set("production_date", e.target.value); setConflict({ conflict: false }); }} onBlur={checkConflict} />
               </div>
               <div>
                 <label className="label">Location</label>
                 <SearchableSelect
-                  multiple
-                  options={locations.map((l) => ({ value: l.id, label: l.name, sub: l.address ?? "" }))}
-                  value={form.location_ids ?? []}
-                  onChange={(v) => set("location_ids", v)}
-                  placeholder="Select locations"
-                  allowCreate
-                  createLabel="Add location"
-                  onCreate={(name) => {
-                    const fd = new FormData();
-                    fd.append("name", name);
-                    fetch("/api/locations", { method: "POST", body: fd }).then(async (r) => {
-                      const json = await r.json();
-                      if (json.ok) { router.refresh(); toast("success", "Location added."); }
-                    });
-                  }}
-                />
+                    multiple
+                    options={locations.map((l) => ({ value: l.id, label: l.name, sub: l.address ?? "" }))}
+                    value={form.location_ids ?? []}
+                    onChange={(v) => set("location_ids", v)}
+                    placeholder="Select locations"
+                    allowCreate
+                    createLabel="Add location"
+                    onCreate={(name) => {
+                      const fd = new FormData();
+                      fd.append("name", name);
+                      fetch("/api/locations", { method: "POST", body: fd }).then(async (r) => {
+                        const json = await r.json();
+                        if (json.ok) { router.refresh(); toast("success", "Location added."); }
+                      });
+                    }}
+                    className={(!form.location_ids || form.location_ids.length === 0) ? "border-danger" : ""}
+                  />
               </div>
               <div>
                 <label className="label">Call time</label>
-                <input type="time" className="input" value={form.call_time ?? ""} onChange={(e) => set("call_time", e.target.value)} />
+                <input type="time" className={`input ${form.call_time ? "" : "border-danger"}`} value={form.call_time ?? ""} onChange={(e) => set("call_time", e.target.value)} />
               </div>
               <div>
                 <label className="label">Start time</label>

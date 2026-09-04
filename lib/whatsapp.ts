@@ -20,6 +20,7 @@ export function buildWhatsappMessage(b: Booking & {
     lines.push(`*📺 Production Booking Update*`);
     lines.push(`────────────────────────`);
     lines.push(`*Booking ID:* ${b.booking_number}`);
+    lines.push(`*Program:* ${b.program?.name ?? "—"}`);
     lines.push(`*Status:* Cancelled`);
     lines.push("");
     lines.push(`This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`);
