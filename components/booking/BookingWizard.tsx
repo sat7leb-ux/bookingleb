@@ -158,12 +158,25 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       }
 
       const payload: BookingInput = { ...form, person_id: personId ?? (guestIds.size ? Array.from(guestIds)[0] : null), guest_ids: Array.from(guestIds) };
-      const result = editMode
-        ? await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, editId: initial.id }) }).then(r => r.json())
-        : await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).then(r => r.json());
-      console.log("[BookingWizard] submit result:", result);
+      let result: any = null;
+      try {
+        const response = editMode
+          ? await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, editId: initial.id }) })
+          : await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        result = await response.json();
+      } catch (err) {
+        console.error("[BookingWizard] submit fetch/json error:", err);
+        toast("error", "Network or parsing error. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+      if (!result) {
+        toast("error", "Empty response from server.");
+        setSubmitting(false);
+        return;
+      }
       if (!result.ok) {
-        toast("error", result.message || "Submit failed.");
+        toast("error", result?.message || "Submit failed.");
         setSubmitting(false);
         return;
       }

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const result = editId ? await updateBooking(editId, input) : await createBooking(input);
     console.log("[bookings POST] result:", result);
     return Response.json(result, { status: result.ok ? (editId ? 200 : 201) : 400 });
-  } catch (err) {
+  } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Invalid request";
     console.log("[bookings POST] error:", message);
     return Response.json({ ok: false, message }, { status: 400 });
