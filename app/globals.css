@@ -77,17 +77,10 @@ body {
     @apply block text-sm font-medium text-fg;
   }
   .input {
-    @apply w-full min-h-[40px] rounded-lg border border-[rgb(var(--border-strong))] bg-white px-3 py-2 text-sm text-fg outline-none transition-colors focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary)/0.15)];
-  }
-  .input::placeholder {
-    @apply text-muted-2;
+    @apply w-full min-h-[40px] rounded-lg border border-[rgb(var(--border-strong))] bg-white px-3 py-2 text-sm text-fg outline-none transition-colors placeholder:text-muted-2 focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgba(var(--primary),0.15)];
   }
   textarea.input {
     @apply min-h-[80px] resize-y;
-  }
-  select.input {
-    @apply appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22rgb(var(--muted))%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>') bg-no-repeat bg-right-3;
-    padding-right: 2rem;
   }
   .border-danger {
     border-color: rgb(var(--danger));
