@@ -111,6 +111,13 @@ export async function archiveChannel(id: string): Promise<CrudState> {
   return { ok: true, message: "Channel archived." };
 }
 
+export async function deleteChannel(id: string): Promise<CrudState> {
+  if (!(await isAdmin())) return { ok: false, message: "Administrator access required." };
+  const { error } = await db("delete from channels where id = $1", [id]);
+  if (error) return { ok: false, message: String((error as any).message) };
+  return { ok: true, message: "Channel deleted permanently." };
+}
+
 // ---- Locations ----
 export async function upsertLocation(formData: FormData): Promise<CrudState> {
   if (!(await isManager())) return { ok: false, message: "Administrator/Manager access required." };

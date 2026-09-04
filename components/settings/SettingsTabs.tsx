@@ -92,7 +92,7 @@ export function SettingsTabs({ settings, channels, locations, users, currentUser
       )}
 
       {tab === "channels" && (
-        <Card className="p-5"><EntityManager items={channels} endpoint="channels" title="Channel" nameLabel="Channel name" /></Card>
+        <Card className="p-5"><EntityManager items={channels} endpoint="channels" title="Channel" nameLabel="Channel name" canDelete={isAdminUser} /></Card>
       )}
       {tab === "locations" && (
         <Card className="p-5"><EntityManager items={locations} endpoint="locations" title="Location" nameLabel="Location name" withAddress /></Card>

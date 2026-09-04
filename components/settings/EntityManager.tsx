@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Archive } from "lucide-react";
+import { Plus, Pencil, Archive, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -14,18 +14,21 @@ export function EntityManager({
   title,
   nameLabel,
   withAddress,
+  canDelete,
 }: {
   items: any[];
   endpoint: string; // e.g. "channels" or "locations"
   title: string;
   nameLabel: string;
   withAddress?: boolean;
+  canDelete?: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [archiveId, setArchiveId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<any>({ name: "", address: "" });
 
   function openCreate() { setEditId(null); setForm({ name: "", address: "" }); setOpen(true); }
@@ -45,6 +48,11 @@ export function EntityManager({
     const res = await fetch(`/api/${endpoint}/archive`, { method: "POST", body: fd }).then((r) => r.json());
     if (!res.ok) toast("error", res.message); else { toast("success", res.message); router.refresh(); }
   }
+  async function doDelete() {
+    const fd = new FormData(); fd.append("id", deleteId ?? "");
+    const res = await fetch(`/api/${endpoint}`, { method: "DELETE", body: fd }).then((r) => r.json());
+    if (!res.ok) toast("error", res.message); else { toast("success", res.message); router.refresh(); }
+  }
 
   return (
     <div className="space-y-3">
@@ -60,6 +68,7 @@ export function EntityManager({
             </div>
             <button onClick={() => openEdit(it)} className="btn-ghost text-xs" aria-label="Edit"><Pencil size={14} /></button>
             <button onClick={() => setArchiveId(it.id)} className="btn-ghost text-xs" aria-label="Archive"><Archive size={14} /></button>
+            {canDelete && <button onClick={() => setDeleteId(it.id)} className="btn-ghost text-xs text-danger hover:text-danger" aria-label="Delete"><Trash2 size={14} /></button>}
           </div>
         ))}
       </div>
@@ -75,6 +84,7 @@ export function EntityManager({
         </div>
       </Modal>
       <ConfirmDialog open={!!archiveId} onClose={() => setArchiveId(null)} onConfirm={doArchive} title={`Archive ${title}?`} message="Archived items are hidden from new bookings." />
+      <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={doDelete} title={`Delete ${title}?`} message="This permanently removes this item from all dropdowns. If it is used in existing bookings, the delete may fail." />
     </div>
   );
 }
