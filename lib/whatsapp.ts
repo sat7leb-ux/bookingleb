@@ -16,6 +16,15 @@ export function buildWhatsappMessage(b: Booking & {
   dress?: any;
 }): string {
   const lines: string[] = [];
+  if (b.confirmation_status === "Cancelled") {
+    lines.push(`*📺 Production Booking Update*`);
+    lines.push(`────────────────────────`);
+    lines.push(`*Booking ID:* ${b.booking_number}`);
+    lines.push(`*Status:* Cancelled`);
+    lines.push("");
+    lines.push(`This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`);
+    return lines.join("\n");
+  }
   lines.push(`*📺 Production Booking Confirmation*`);
   lines.push(`────────────────────────`);
   lines.push(`*Booking ID:* ${b.booking_number}`);

@@ -45,6 +45,16 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
 
   function buildMessage() {
     const b = { ...booking, requirements, transportation, dress };
+    if (b.confirmation_status === "Cancelled") {
+      return [
+        `*📺 Production Booking Update*`,
+        `────────────────────────`,
+        `*Booking ID:* ${b.booking_number}`,
+        `*Status:* Cancelled`,
+        ``,
+        `This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`,
+      ].join("\n");
+    }
     const lines = [
       `*📺 Production Booking Confirmation*`,
       `────────────────────────`,

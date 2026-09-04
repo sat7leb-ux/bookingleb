@@ -93,7 +93,7 @@ export function ProgramsManager({ programs, channels }: { programs: any[]; chann
 
       <Modal open={open} onClose={() => setOpen(false)} title={editId ? "Edit Program" : "Add Program"}>
         <form id="program-form" onSubmit={save} className="space-y-3">
-          <div><label className="label">Program name *</label><input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+          <div><label className="label">Program name *</label><input className={`input ${form.name ? "" : "border-danger"}`} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Channel</label>
