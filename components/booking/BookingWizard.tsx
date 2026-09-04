@@ -159,8 +159,8 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
 
       const payload: BookingInput = { ...form, person_id: personId ?? (guestIds.size ? Array.from(guestIds)[0] : null), guest_ids: Array.from(guestIds) };
       const result = editMode
-        ? await updateBooking(initial.id, payload)
-        : await createBooking(payload);
+        ? await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, editId: initial.id }) }).then(r => r.json())
+        : await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).then(r => r.json());
       if (!result.ok) {
         toast("error", result.message);
         setSubmitting(false);
