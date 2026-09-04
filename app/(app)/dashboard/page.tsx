@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard label="Today" value={stats.today} icon={<CalendarClock size={18} />} accent="info" sub="bookings" href="/bookings?date=today" />
         <StatCard label="Upcoming" value={stats.upcoming} icon={<CalendarDays size={18} />} accent="primary" sub="scheduled" href="/bookings?from=today" />
-        <StatCard label="Pending" value={stats.pending} icon={<Hourglass size={18} />} accent="warning" sub="awaiting reply" href="/bookings?status=Pending+Confirmation" />
+        <StatCard label="In Progress" value={stats.in_progress} icon={<Hourglass size={18} />} accent="info" sub="awaiting action" href="/bookings?status=In+Progress" />
         <StatCard label="Confirmed" value={stats.confirmed} icon={<CheckCircle2 size={18} />} accent="success" sub="locked in" href="/bookings?status=Confirmed" />
         <StatCard label="Reschedule" value={stats.reschedule} icon={<RefreshCw size={18} />} accent="violet" sub="requests" href="/bookings?status=Reschedule+Requested" />
         <StatCard label="Cancelled" value={stats.cancelled} icon={<XCircle size={18} />} accent="danger" sub="this period" href="/bookings?status=Cancelled" />

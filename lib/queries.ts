@@ -269,7 +269,7 @@ export async function getDashboardStats(): Promise<{
   const { rows: all } = await db<any>("select b.confirmation_status, b.production_date, b.live_recorded, c.name as channel_name from bookings b left join channels c on c.id = b.channel_id");
   const today = new Date().toISOString().slice(0, 10);
   const count = (s: string) => all.filter((r) => r.confirmation_status === s).length;
-  const byStatus = ["Pending Confirmation", "Confirmed", "Declined", "Reschedule Requested", "Cancelled"].map((status) => ({ status, count: count(status) }));
+  const byStatus = ["In Progress", "Confirmed", "Declined", "Reschedule Requested", "Cancelled"].map((status) => ({ status, count: count(status) }));
   const byChannelMap = new Map<string, number>();
   all.forEach((r) => { const n = r.channel_name || "Unknown"; byChannelMap.set(n, (byChannelMap.get(n) ?? 0) + 1); });
   const byChannel = [...byChannelMap.entries()].map(([name, c]) => ({ name, count: c })).sort((a, b) => b.count - a.count);
@@ -293,7 +293,7 @@ export async function getDashboardStats(): Promise<{
     total: all.length,
     today: all.filter((r) => r.production_date === today).length,
     upcoming: all.filter((r) => r.production_date && r.production_date >= today).length,
-    pending: count("Pending Confirmation"),
+    in_progress: count("In Progress"),
     confirmed: count("Confirmed"),
     reschedule: count("Reschedule Requested"),
     cancelled: count("Cancelled"),

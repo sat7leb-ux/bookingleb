@@ -78,8 +78,8 @@ create table if not exists public.bookings (
   recorded_episodes_count integer,
   location_id uuid references public.locations (id) on delete restrict,
   extra_notes text,
-  confirmation_status text not null default 'Pending Confirmation'
-    check (confirmation_status in ('Pending Confirmation','Confirmed','Declined','Reschedule Requested','Cancelled')),
+  confirmation_status text not null default 'In Progress'
+    check (confirmation_status in ('In Progress','Confirmed','Declined','Reschedule Requested','Cancelled')),
   created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

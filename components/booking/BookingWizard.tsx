@@ -550,7 +550,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
               </div>
               <div className="rounded-lg border border-border bg-surface-2/40 p-3">
                 <p className="text-xs font-medium text-muted">Status</p>
-                <p className="mt-1 text-sm text-fg">Confirmed</p>
+                <p className="mt-1 text-sm text-fg">In Progress</p>
               </div>
             </div>
           </div>

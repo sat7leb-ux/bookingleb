@@ -18,8 +18,8 @@ export const ROLES: Role[] = [
 ];
 
 export const CONFIRMATION_STATUSES: ConfirmationStatus[] = [
-  "Pending Confirmation",
   "In Progress",
+  "Pending Confirmation",
   "Confirmed",
   "Declined",
   "Reschedule Requested",
