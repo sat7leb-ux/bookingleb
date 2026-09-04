@@ -256,7 +256,7 @@ export async function getDashboardStats(): Promise<{
   total: number;
   today: number;
   upcoming: number;
-  pending: number;
+  in_progress: number;
   confirmed: number;
   reschedule: number;
   cancelled: number;
