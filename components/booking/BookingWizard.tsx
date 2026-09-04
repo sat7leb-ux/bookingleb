@@ -7,6 +7,7 @@ import {
   Clapperboard,
   CalendarClock,
   SlidersHorizontal,
+  Truck,
   Shirt,
   CheckCircle2,
   ChevronLeft,
