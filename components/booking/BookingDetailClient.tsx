@@ -6,7 +6,6 @@ import {
   Phone,
   Pencil,
   XCircle,
-  MessageCircle,
   CheckCircle2,
   RefreshCw,
   X,
@@ -18,10 +17,11 @@ import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
-import { CONFIRMATION_STATUSES, waLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
+import { CONFIRMATION_STATUSES, waLink as makeWaLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
 import { setBookingStatus, cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
 import { canEditBooking, canDeleteBooking, canChangeStatus } from "@/lib/auth";
+import { buildWhatsappMessage } from "@/lib/whatsapp";
 
 export function BookingDetailClient({ booking, requirements, transportation, dress, messages, activity, guests, canEdit, canDelete, canChangeStatus }: {
   booking: any;
@@ -43,64 +43,16 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  function buildMessage(personName: string = "") {
-    const b = { ...booking, requirements, transportation, dress };
-    if (b.confirmation_status === "Cancelled") {
-      return [
-        `*📺 Production Booking Update*`,
-        `────────────────────────`,
-        `*Booking ID:* ${b.booking_number}`,
-        `*Program:* ${b.program?.name ?? "—"}`,
-        `*Status:* Cancelled`,
-        ``,
-        `This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`,
-      ].join("\n");
-    }
-    const name = personName || b.person?.full_name || "";
-    const lines = [
-      `*📺 Production Booking Confirmation*`,
-      `────────────────────────`,
-      `*Booking ID:* ${b.booking_number}`,
-      `*Person:* ${name || "—"}`,
-      `*Program:* ${b.program?.name ?? "—"}`,
-      `*Channel:* ${b.channel?.name ?? "—"}`,
-      `*Date:* ${formatDate(b.production_date)}`,
-      `*Call Time:* ${b.call_time ?? "—"}`,
-      `*Start:* ${b.start_time ?? "—"}  *End:* ${b.end_time ?? "—"}`,
-      `*Live/Recorded:* ${b.live_recorded}`,
-      b.episode_number ? `*Episode:* ${b.episode_number}` : "",
-      `*Location:* ${b.location?.name ?? "—"}`,
-      requirements?.place_in ? `*Place-In:* ${requirements.place_in} @ ${requirements.place_in_time ?? "—"} (${requirements.place_in_location ?? "—"})` : "",
-      requirements?.top_camera ? `*Top Camera:* ${requirements.top_camera} @ ${requirements.top_camera_time ?? "—"} (${requirements.top_camera_location ?? "—"})` : "",
-      transportation ? `*Transportation:* ${transportation.type}` : "",
-      dress ? `*Dress Code:* ${dress.code}` : "",
-    ].filter(Boolean);
-    lines.push("");
-    lines.push(`*Please confirm your availability, ${name}:*`);
-    lines.push(`✅ Confirm`);
-    lines.push(`❌ Decline`);
-    lines.push(`📝 Other reason: ...`);
-    lines.push("");
-    lines.push(`_Reply with your choice or comments._`);
-    return lines.join("\n");
-  }
-
-  async function openWhatsApp() {
-    const people = guests && guests.length > 0 ? guests : booking.person ? [booking.person] : [];
-    const withWhatsApp = people.filter((p: any) => p.whatsapp);
-    if (!withWhatsApp.length) {
-      toast("warning", "No WhatsApp number on file for this booking.");
-      return;
-    }
-    setProcessing(true);
-    for (const p of withWhatsApp) {
-      const text = buildMessage(p.full_name);
-      await recordWhatsapp(booking.id, p.whatsapp ?? "", text, booking.channel?.name ?? "");
-      const link = waLink(p.whatsapp, text);
-      if (link !== "#") window.open(link, "_blank");
-    }
-    setProcessing(false);
-    toast("info", `WhatsApp opened for ${withWhatsApp.length} contact(s). Delivery is confirmed by the guest, not the system.`);
+  async function sendToPerson(p: { full_name: string; whatsapp?: string | null }) {
+    if (!p.whatsapp) return;
+    const text = buildWhatsappMessage(
+      { ...booking, requirements, transportation, dress },
+      { full_name: p.full_name }
+    );
+    await recordWhatsapp(booking.id, p.whatsapp, text, booking.channel?.name ?? "");
+    const link = makeWaLink(p.whatsapp, text);
+    if (link !== "#") window.open(link, "_blank");
+    alert(`WhatsApp opened for ${p.full_name}.`);
     router.refresh();
   }
 
@@ -137,9 +89,6 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       <div className="mb-4 flex flex-wrap items-center gap-2 print:hidden">
         <StatusBadge status={booking.confirmation_status} />
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <Button variant="soft" onClick={openWhatsApp} disabled={processing}>
-            <MessageCircle size={15} /> WhatsApp
-          </Button>
           {canEdit && (
             <Button variant="ghost" onClick={() => router.push(`/bookings/${booking.id}/edit`)}>
               <Pencil size={15} /> Edit
@@ -192,8 +141,22 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
             <div className="space-y-2">
               {guests.map((g, i) => (
                 <div key={g.id} className="rounded-lg border border-border bg-surface-2/40 px-3 py-2 text-sm">
-                  <div className="font-medium text-fg">{g.full_name}{i === 0 ? " · Primary" : ""}</div>
-                  <div className="text-xs text-muted">{[g.whatsapp, g.email].filter(Boolean).join(" · ") || "—"}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-medium text-fg">{g.full_name}{i === 0 ? " · Primary" : ""}</div>
+                      <div className="text-xs text-muted">{[g.whatsapp, g.email].filter(Boolean).join(" · ") || "—"}</div>
+                    </div>
+                    {g.whatsapp && (
+                      <button
+                        onClick={() => sendToPerson(g)}
+                        className="rounded-md p-1.5 text-[#25D366] hover:bg-[#25D366]/10"
+                        aria-label={`Send WhatsApp to ${g.full_name}`}
+                        title="Send WhatsApp"
+                      >
+                        <MessageCircle size={16} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

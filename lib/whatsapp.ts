@@ -1,11 +1,6 @@
 import { formatDate } from "@/lib/utils";
 import type { Booking } from "@/lib/types";
 
-/**
- * Build a formatted WhatsApp confirmation message. We do NOT claim delivery —
- * the deep link only opens WhatsApp with the pre-filled text. The status stays
- * "prepared" until the user actually sends it in WhatsApp.
- */
 export function buildWhatsappMessage(b: Booking & {
   person?: { full_name: string; whatsapp?: string | null } | null;
   program?: { name: string } | null;
@@ -14,7 +9,8 @@ export function buildWhatsappMessage(b: Booking & {
   requirements?: any;
   transportation?: any;
   dress?: any;
-}): string {
+}, overrides?: { full_name?: string | null }): string {
+  const personName = overrides?.full_name ?? b.person?.full_name ?? "Guest";
   const lines: string[] = [];
   if (b.confirmation_status === "Cancelled") {
     lines.push(`*📺 Production Booking Update*`);
@@ -29,7 +25,7 @@ export function buildWhatsappMessage(b: Booking & {
   lines.push(`*📺 Production Booking Confirmation*`);
   lines.push(`────────────────────────`);
   lines.push(`*Booking ID:* ${b.booking_number}`);
-  lines.push(`*Person:* ${b.person?.full_name ?? "—"}`);
+  lines.push(`*Person:* ${personName}`);
   lines.push(`*Program:* ${b.program?.name ?? "—"}`);
   lines.push(`*Channel:* ${b.channel?.name ?? "—"}`);
   lines.push(`*Date:* ${formatDate(b.production_date)}`);
@@ -50,6 +46,7 @@ export function buildWhatsappMessage(b: Booking & {
     if (b.transportation.departure_time) lines.push(`• Departure: ${b.transportation.departure_time}`);
     if (b.transportation.pickup_location) lines.push(`• Pickup: ${b.transportation.pickup_location}`);
     if (b.transportation.driver) lines.push(`• Driver: ${b.transportation.driver}`);
+    if (b.transportation.notes) lines.push(`• Note: ${b.transportation.notes}`);
   }
   if (b.dress) {
     lines.push(``);
@@ -57,11 +54,17 @@ export function buildWhatsappMessage(b: Booking & {
     if (b.dress.notes) lines.push(`• ${b.dress.notes}`);
   }
   lines.push(``);
-  lines.push(`*Please confirm your availability, ${b.person?.full_name ?? ""}:*`);
+  lines.push(`*Please confirm your availability, ${personName}:*`);
   lines.push(`✅ Confirm`);
   lines.push(`❌ Decline`);
   lines.push(`📝 Other reason: ...`);
   lines.push(``);
   lines.push(`_Reply with your choice or comments._`);
   return lines.join("\n");
+}
+
+export function waLink(phone: string | null | undefined, text: string): string {
+  const num = (phone ?? "").replace(/\D/g, "");
+  if (!num) return "#";
+  return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
 }
