@@ -75,7 +75,7 @@ async function upsertGuests(bookingId: string, input: BookingInput, userId: stri
 }
 
 async function insertBooking(input: BookingInput, userId: string): Promise<string> {
-  const { rows } = await db<{ id: string }>(
+  const res = await db<{ id: string }>(
     `insert into bookings
        (person_id, program_id, channel_id, production_date, call_time, start_time, end_time,
         live_recorded, episode_number, recorded_episodes_count, location_id, extra_notes, created_by, confirmation_status)
@@ -88,7 +88,9 @@ async function insertBooking(input: BookingInput, userId: string): Promise<strin
       input.extra_notes, userId,
     ],
   );
-  return rows[0].id;
+  if (res.error) throw new Error(res.error.message || "Failed to create booking");
+  if (!res.rows[0]?.id) throw new Error("Booking was not created.");
+  return res.rows[0].id;
 }
 
 async function upsertChildren(bookingId: string, input: BookingInput) {
