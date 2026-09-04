@@ -459,7 +459,16 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="label">Type</label>
-                <input className="input" placeholder="Transport type" value={form.transportation?.type ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), type: e.target.value } as any)} />
+                <select
+                  className="input"
+                  value={form.transportation?.type ?? ""}
+                  onChange={(e) => set("transportation", { ...(form.transportation ?? {}), type: e.target.value } as any)}
+                >
+                  <option value="">Select type</option>
+                  {TRANSPORTATION_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="label">Departure time</label>
@@ -487,7 +496,16 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="label">Code</label>
-                <input className="input" placeholder="Dress code" value={form.dress_code?.code ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), code: e.target.value } as any)} />
+                <select
+                  className="input"
+                  value={form.dress_code?.code ?? ""}
+                  onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), code: e.target.value } as any)}
+                >
+                  <option value="">Select dress code</option>
+                  {DRESS_CODES.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <textarea className="input min-h-[60px]" placeholder="Dress code notes" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), notes: e.target.value } as any)} />
