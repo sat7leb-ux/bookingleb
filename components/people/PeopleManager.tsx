@@ -118,16 +118,34 @@ export function PeopleManager({ people, initial }: { people: any[]; initial?: an
 
       <Modal open={open} onClose={() => setOpen(false)} title={editId ? "Edit Person" : "Add Person"}>
         <form id="person-form" onSubmit={save} className="space-y-3">
-          <div><label className="label">Full name *</label><input className={`input ${form.full_name ? "" : "border-danger"}`} required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
-          <div className="grid grid-cols-2 gap-3">
-            <div><label className="label">WhatsApp</label><input className="input" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} /></div>
-            <div><label className="label">Email</label><input className="input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div>
+            <label className="label">Full name *</label>
+            <input className={`input ${form.full_name ? "" : "border-danger"}`} required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="label">Company</label><input className="input" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} /></div>
-            <div><label className="label">Department</label><input className="input" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} /></div>
+            <div>
+              <label className="label">WhatsApp</label>
+              <input className={`input ${form.whatsapp ? "" : "border-danger"}`} value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
+            </div>
+            <div>
+              <label className="label">Email</label>
+              <input className={`input ${form.email ? "" : "border-danger"}`} type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </div>
           </div>
-          <div><label className="label">Notes</label><textarea className="input min-h-[60px]" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Company</label>
+              <input className={`input ${form.company ? "" : "border-danger"}`} value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+            </div>
+            <div>
+              <label className="label">Department</label>
+              <input className={`input ${form.department ? "" : "border-danger"}`} value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
+            </div>
+          </div>
+          <div>
+            <label className="label">Notes</label>
+            <textarea className={`input min-h-[60px] ${form.notes ? "" : "border-danger"}`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          </div>
         </form>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>

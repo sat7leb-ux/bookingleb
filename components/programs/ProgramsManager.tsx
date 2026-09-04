@@ -93,20 +93,38 @@ export function ProgramsManager({ programs, channels }: { programs: any[]; chann
 
       <Modal open={open} onClose={() => setOpen(false)} title={editId ? "Edit Program" : "Add Program"}>
         <form id="program-form" onSubmit={save} className="space-y-3">
-          <div><label className="label">Program name *</label><input className={`input ${form.name ? "" : "border-danger"}`} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+          <div>
+            <label className="label">Program name *</label>
+            <input className={`input ${form.name ? "" : "border-danger"}`} required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Channel</label>
               <SearchableSelect options={channels.map((c) => ({ value: c.id, label: c.name }))} value={form.channel_id || null} onChange={(v) => setForm({ ...form, channel_id: v })} placeholder="Select channel" />
             </div>
-            <div><label className="label">Company</label><input className="input" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} /></div>
+            <div>
+              <label className="label">Company</label>
+              <input className={`input ${form.company ? "" : "border-danger"}`} value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+            </div>
           </div>
-          <div><label className="label">Default location</label><input className="input" value={form.default_location} onChange={(e) => setForm({ ...form, default_location: e.target.value })} /></div>
+          <div>
+            <label className="label">Default location</label>
+            <input className={`input ${form.default_location ? "" : "border-danger"}`} value={form.default_location} onChange={(e) => setForm({ ...form, default_location: e.target.value })} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="label">Default Place-In</label><input className="input" value={form.default_place_in} onChange={(e) => setForm({ ...form, default_place_in: e.target.value })} /></div>
-            <div><label className="label">Default Top Camera</label><input className="input" value={form.default_top_camera} onChange={(e) => setForm({ ...form, default_top_camera: e.target.value })} /></div>
+            <div>
+              <label className="label">Default Place-In</label>
+              <input className={`input ${form.default_place_in ? "" : "border-danger"}`} value={form.default_place_in} onChange={(e) => setForm({ ...form, default_place_in: e.target.value })} />
+            </div>
+            <div>
+              <label className="label">Default Top Camera</label>
+              <input className={`input ${form.default_top_camera ? "" : "border-danger"}`} value={form.default_top_camera} onChange={(e) => setForm({ ...form, default_top_camera: e.target.value })} />
+            </div>
           </div>
-          <div><label className="label">Notes</label><textarea className="input min-h-[60px]" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
+          <div>
+            <label className="label">Notes</label>
+            <textarea className={`input min-h-[60px] ${form.notes ? "" : "border-danger"}`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          </div>
         </form>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>

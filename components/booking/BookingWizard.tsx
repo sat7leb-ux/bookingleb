@@ -463,7 +463,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           <div className="space-y-5">
             <div>
               <h2 className="section-title">Transportation</h2>
-              <p className="muted mt-1">Select the transport type for this production.</p>
+              <p className="muted mt-1">Select the transport type and provide the driver details.</p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {TRANSPORTATION_TYPES.map((t) => (
@@ -479,6 +479,24 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                   <span className="text-sm font-medium">{t}</span>
                 </button>
               ))}
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="label">Departure time</label>
+                <input type="time" className={`input ${(form.transportation?.departure_time ?? "") === "" ? "border-danger" : ""}`} value={form.transportation?.departure_time ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), departure_time: e.target.value } as any)} />
+              </div>
+              <div>
+                <label className="label">Pickup location</label>
+                <input className={`input ${(form.transportation?.pickup_location ?? "") === "" ? "border-danger" : ""}`} placeholder="Pickup location" value={form.transportation?.pickup_location ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), pickup_location: e.target.value } as any)} />
+              </div>
+              <div>
+                <label className="label">Driver name</label>
+                <input className={`input ${(form.transportation?.driver_name ?? "") === "" ? "border-danger" : ""}`} placeholder="Driver name" value={form.transportation?.driver_name ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), driver_name: e.target.value } as any)} />
+              </div>
+              <div>
+                <label className="label">Transport note</label>
+                <input className={`input ${(form.transportation?.note ?? "") === "" ? "border-danger" : ""}`} placeholder="Note" value={form.transportation?.note ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), note: e.target.value } as any)} />
+              </div>
             </div>
           </div>
         )}
