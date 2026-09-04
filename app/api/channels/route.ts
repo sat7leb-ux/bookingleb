@@ -1,4 +1,14 @@
-import { deleteChannel } from "@/services/crud";
+import { upsertChannel, deleteChannel } from "@/services/crud";
+
+export async function POST(req: Request) {
+  try {
+    const fd = await req.formData();
+    const res = await upsertChannel(fd);
+    return Response.json(res, { status: res.ok ? 200 : 400 });
+  } catch {
+    return Response.json({ ok: false, message: "Invalid request" }, { status: 400 });
+  }
+}
 
 export async function DELETE(req: Request) {
   try {
