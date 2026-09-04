@@ -43,7 +43,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  function buildMessage() {
+  function buildMessage(personName: string = "") {
     const b = { ...booking, requirements, transportation, dress };
     if (b.confirmation_status === "Cancelled") {
       return [
@@ -56,11 +56,12 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
         `This booking/schedule has been cancelled. If this was unexpected, please contact the production office.`,
       ].join("\n");
     }
+    const name = personName || b.person?.full_name || "";
     const lines = [
       `*📺 Production Booking Confirmation*`,
       `────────────────────────`,
       `*Booking ID:* ${b.booking_number}`,
-      `*Person:* ${b.person?.full_name ?? "—"}`,
+      `*Person:* ${name || "—"}`,
       `*Program:* ${b.program?.name ?? "—"}`,
       `*Channel:* ${b.channel?.name ?? "—"}`,
       `*Date:* ${formatDate(b.production_date)}`,
@@ -75,7 +76,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
       dress ? `*Dress Code:* ${dress.code}` : "",
     ].filter(Boolean);
     lines.push("");
-    lines.push(`*Please confirm your availability, ${b.person?.full_name ?? ""}:*`);
+    lines.push(`*Please confirm your availability, ${name}:*`);
     lines.push(`✅ Confirm`);
     lines.push(`❌ Decline`);
     lines.push(`📝 Other reason: ...`);
@@ -85,29 +86,21 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   }
 
   async function openWhatsApp() {
-    const text = buildMessage();
-    setWaText(text);
-    // record as prepared (honest: not delivered)
+    const people = guests && guests.length > 0 ? guests : booking.person ? [booking.person] : [];
+    const withWhatsApp = people.filter((p: any) => p.whatsapp);
+    if (!withWhatsApp.length) {
+      toast("warning", "No WhatsApp number on file for this booking.");
+      return;
+    }
     setProcessing(true);
-    const res = await recordWhatsapp(
-      booking.id,
-      booking.person?.whatsapp ?? "",
-      text,
-      booking.channel?.name ?? "",
-    );
+    for (const p of withWhatsApp) {
+      const text = buildMessage(p.full_name);
+      await recordWhatsapp(booking.id, p.whatsapp ?? "", text, booking.channel?.name ?? "");
+      const link = waLink(p.whatsapp, text);
+      if (link !== "#") window.open(link, "_blank");
+    }
     setProcessing(false);
-    if (!res.ok) {
-      toast("error", res.message);
-      return;
-    }
-    const link = waLink(booking.person?.whatsapp, text);
-    if (link === "#") {
-      toast("warning", "No WhatsApp number on file for this guest.");
-      return;
-    }
-    // open WhatsApp — we do NOT claim delivery
-    window.open(link, "_blank");
-    toast("info", "WhatsApp opened. Delivery is confirmed by the guest, not the system.");
+    toast("info", `WhatsApp opened for ${withWhatsApp.length} contact(s). Delivery is confirmed by the guest, not the system.`);
     router.refresh();
   }
 

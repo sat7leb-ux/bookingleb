@@ -1,6 +1,6 @@
 "use client";
 import { MessageCircle } from "lucide-react";
-import { waLink } from "@/lib/whatsapp";
+import { waLink } from "@/lib/utils";
 
 export function BookingWhatsAppButton({ booking }: { booking: any }) {
   const person = booking.person;

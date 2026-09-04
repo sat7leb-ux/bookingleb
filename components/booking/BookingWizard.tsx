@@ -7,7 +7,6 @@ import {
   Clapperboard,
   CalendarClock,
   SlidersHorizontal,
-  Truck,
   Shirt,
   CheckCircle2,
   ChevronLeft,
@@ -49,9 +48,8 @@ const STEPS = [
   { id: 2, label: "Program", icon: Clapperboard },
   { id: 3, label: "Schedule", icon: CalendarClock },
   { id: 4, label: "Production", icon: SlidersHorizontal },
-  { id: 5, label: "Transport", icon: Truck },
-  { id: 6, label: "Dress", icon: Shirt },
-  { id: 7, label: "Review", icon: CheckCircle2 },
+  { id: 5, label: "Transport & Dress", icon: Shirt },
+  { id: 6, label: "Review", icon: CheckCircle2 },
 ];
 
 export function BookingWizard({ people, programs, channels, locations, initial, editMode }: WizardProps) {
@@ -254,8 +252,10 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 allowCreate
                 createLabel="Create person"
                 onCreate={(name) => setNewPerson({ full_name: name })}
-                className={(!form.guest_ids || form.guest_ids.length === 0) && !newPerson.full_name ? "border-danger" : ""}
               />
+              {(!form.guest_ids || form.guest_ids.length === 0) && !newPerson.full_name && (
+                <p className="mt-1 text-xs text-danger">Please select or create a person.</p>
+              )}
             </div>
 
             {!form.guest_ids?.length && (
@@ -308,8 +308,10 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                     }
                   });
                 }}
-                className={!form.program_id ? "border-danger" : ""}
               />
+              {!form.program_id && (
+                <p className="mt-1 text-xs text-danger">Please select or create a program.</p>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
@@ -392,8 +394,10 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                         if (json.ok) { router.refresh(); toast("success", "Location added."); }
                       });
                     }}
-                    className={(!form.location_ids || form.location_ids.length === 0) ? "border-danger" : ""}
                   />
+                  {(!form.location_ids || form.location_ids.length === 0) && (
+                    <p className="mt-1 text-xs text-danger">Please select at least one location.</p>
+                  )}
               </div>
               <div>
                 <label className="label">Call time</label>
@@ -456,12 +460,12 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 5 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Transportation</h2>
-              <p className="muted mt-1">Travel and logistics for the production team.</p>
+              <h2 className="section-title">Transport & Dress</h2>
+              <p className="muted mt-1">Choose transport and dress code for this production.</p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="label">Type</label>
+                <label className="label">Transportation Type</label>
                 <select
                   className="input"
                   value={form.transportation?.type ?? ""}
@@ -474,31 +478,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 </select>
               </div>
               <div>
-                <label className="label">Departure time</label>
-                <input type="time" className="input" value={form.transportation?.departure_time ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), departure_time: e.target.value } as any)} />
-              </div>
-              <div>
-                <label className="label">Pickup location</label>
-                <input className="input" placeholder="Pickup location" value={form.transportation?.pickup_location ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), pickup_location: e.target.value } as any)} />
-              </div>
-              <div>
-                <label className="label">Driver</label>
-                <input className="input" placeholder="Driver name" value={form.transportation?.driver ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), driver: e.target.value } as any)} />
-              </div>
-            </div>
-            <textarea className="input min-h-[60px]" placeholder="Transportation notes" value={form.transportation?.notes ?? ""} onChange={(e) => set("transportation", { ...(form.transportation ?? {}), notes: e.target.value } as any)} />
-          </div>
-        )}
-
-        {step === 6 && (
-          <div className="space-y-5">
-            <div>
-              <h2 className="section-title">Dress Code</h2>
-              <p className="muted mt-1">Set the expected dress code for this production.</p>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label className="label">Code</label>
+                <label className="label">Dress Code</label>
                 <select
                   className="input"
                   value={form.dress_code?.code ?? ""}
@@ -511,7 +491,6 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 </select>
               </div>
             </div>
-            <textarea className="input min-h-[60px]" placeholder="Dress code notes" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), notes: e.target.value } as any)} />
           </div>
         )}
 
@@ -550,7 +529,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             {errors[step] && errors[step].length > 0 && step < 7 && (
               <span className="text-xs text-danger">{errors[step].map((e) => `• ${e}`).join(" ")}</span>
             )}
-            {step < 7 ? (
+            {step < 6 ? (
               <button type="button" disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="btn-primary disabled:opacity-30">
                 Next <ChevronRight size={15} />
               </button>

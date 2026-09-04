@@ -8,6 +8,7 @@ import { StatusSelect } from "@/components/booking/StatusSelect";
 import { Button } from "@/components/ui/Button";
 import { BookingsToolbar } from "@/components/booking/BookingsToolbar";
 import { canWrite, canChangeStatus } from "@/lib/auth";
+import { BookingWhatsAppButton } from "@/components/booking/BookingWhatsAppButton";
 
 export const dynamic = "force-dynamic";
 
