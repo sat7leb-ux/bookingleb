@@ -71,6 +71,7 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
     else {
       toast("success", res.message);
       router.refresh();
+      window.location.reload();
     }
   }
 
