@@ -43,8 +43,9 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
   const [processing, setProcessing] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [waSent, setWaSent] = useState<Set<string>>(new Set());
 
-  async function sendToPerson(p: { full_name: string; whatsapp?: string | null }) {
+  async function sendToPerson(p: { id?: string; full_name: string; whatsapp?: string | null }) {
     if (!p.whatsapp) return;
     const text = buildWhatsappMessage(
       { ...booking, requirements, transportation, dress },
@@ -53,6 +54,11 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
     await recordWhatsapp(booking.id, p.whatsapp, text, booking.channel?.name ?? "");
     const link = makeWaLink(p.whatsapp, text);
     if (link !== "#") window.open(link, "_blank");
+    setWaSent((s) => {
+      const next = new Set(s);
+      if (p.id) next.add(p.id);
+      return next;
+    });
     alert(`WhatsApp opened for ${p.full_name}.`);
     router.refresh();
   }
@@ -143,14 +149,14 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
               {guests.map((g, i) => (
                 <div key={g.id} className="rounded-lg border border-border bg-surface-2/40 px-3 py-2 text-sm">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-medium text-fg">{g.full_name}{i === 0 ? " · Primary" : ""}</div>
+                    <div className={`min-w-0 rounded-md px-2 py-1 ${waSent.has(g.id) ? "bg-[#25D366]/15 text-[#25D366]" : "bg-transparent text-fg"}`}>
+                      <div className="font-medium">{g.full_name}</div>
                       <div className="text-xs text-muted">{[g.whatsapp, g.email].filter(Boolean).join(" · ") || "—"}</div>
                     </div>
                     {g.whatsapp && (
                       <button
                         onClick={() => sendToPerson(g)}
-                        className="rounded-md p-1.5 text-[#25D366] hover:bg-[#25D366]/10"
+                        className={`rounded-md p-1.5 ${waSent.has(g.id) ? "bg-[#25D366]/15 text-[#25D366]" : "text-[#25D366] hover:bg-[#25D366]/10"}`}
                         aria-label={`Send WhatsApp to ${g.full_name}`}
                         title="Send WhatsApp"
                       >

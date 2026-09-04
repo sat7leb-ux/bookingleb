@@ -522,6 +522,10 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 </button>
               ))}
             </div>
+            <div>
+              <label className="label">Dress note</label>
+              <input className={`input ${(form.dress_code?.notes ?? "") === "" ? "border-danger" : ""}`} placeholder="Note" value={form.dress_code?.notes ?? ""} onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), notes: e.target.value } as any)} />
+            </div>
           </div>
         )}
 
