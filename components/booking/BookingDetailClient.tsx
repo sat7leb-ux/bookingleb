@@ -19,7 +19,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { CONFIRMATION_STATUSES, waLink as makeWaLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
-import { setBookingStatus, cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
+import { cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
 import { canEditBooking, canDeleteBooking, canChangeStatus } from "@/lib/auth";
 import { buildWhatsappMessage } from "@/lib/whatsapp";
@@ -65,13 +65,23 @@ export function BookingDetailClient({ booking, requirements, transportation, dre
 
   async function changeStatus(s: any) {
     setProcessing(true);
-    const res = await setBookingStatus(booking.id, s);
-    setProcessing(false);
-    if (!res.ok) toast("error", res.message);
-    else {
-      toast("success", res.message);
-      router.refresh();
-      window.location.reload();
+    try {
+      const res = await fetch(`/api/bookings/${booking.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation_status: s }),
+      }).then((r) => r.json());
+      if (!res.ok) {
+        toast("error", res.message || "Failed to update status");
+      } else {
+        toast("success", res.message);
+        router.refresh();
+        window.location.reload();
+      }
+    } catch {
+      toast("error", "Network error");
+    } finally {
+      setProcessing(false);
     }
   }
 

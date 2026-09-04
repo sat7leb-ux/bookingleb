@@ -17,7 +17,11 @@ export function StatusSelect({ bookingId, current, canChange }: { bookingId: str
     setProcessing(true);
     setError(null);
     try {
-      const res = await setBookingStatus(bookingId, next);
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation_status: next }),
+      }).then((r) => r.json());
       if (!res.ok) {
         setError(res.message || "Failed to update status");
       } else {
