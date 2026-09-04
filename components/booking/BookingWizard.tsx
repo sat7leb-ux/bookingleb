@@ -161,8 +161,9 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
       const result = editMode
         ? await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, editId: initial.id }) }).then(r => r.json())
         : await fetch(`/api/bookings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).then(r => r.json());
+      console.log("[BookingWizard] submit result:", result);
       if (!result.ok) {
-        toast("error", result.message);
+        toast("error", result.message || "Submit failed.");
         setSubmitting(false);
         return;
       }
