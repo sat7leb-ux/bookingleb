@@ -48,8 +48,9 @@ const STEPS = [
   { id: 2, label: "Program", icon: Clapperboard },
   { id: 3, label: "Schedule", icon: CalendarClock },
   { id: 4, label: "Production", icon: SlidersHorizontal },
-  { id: 5, label: "Transport & Dress", icon: Shirt },
-  { id: 6, label: "Review", icon: CheckCircle2 },
+  { id: 5, label: "Transport", icon: Truck },
+  { id: 6, label: "Dress", icon: Shirt },
+  { id: 7, label: "Review", icon: CheckCircle2 },
 ];
 
 export function BookingWizard({ people, programs, channels, locations, initial, editMode }: WizardProps) {
@@ -460,36 +461,47 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 5 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Transport & Dress</h2>
-              <p className="muted mt-1">Choose transport and dress code for this production.</p>
+              <h2 className="section-title">Transportation</h2>
+              <p className="muted mt-1">Select the transport type for this production.</p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label className="label">Transportation Type</label>
-                <select
-                  className="input"
-                  value={form.transportation?.type ?? ""}
-                  onChange={(e) => set("transportation", { ...(form.transportation ?? {}), type: e.target.value } as any)}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {TRANSPORTATION_TYPES.map((t) => (
+                <button
+                  type="button"
+                  key={t}
+                  onClick={() => set("transportation", { ...(form.transportation ?? {}), type: t } as any)}
+                  className={cn(
+                    "btn flex h-16 flex-col items-center justify-center gap-1 text-center",
+                    form.transportation?.type === t ? "bg-primary text-primary-fg border-primary" : "bg-surface text-fg border border-border hover:border-primary/60"
+                  )}
                 >
-                  <option value="">Select type</option>
-                  {TRANSPORTATION_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="label">Dress Code</label>
-                <select
-                  className="input"
-                  value={form.dress_code?.code ?? ""}
-                  onChange={(e) => set("dress_code", { ...(form.dress_code ?? {}), code: e.target.value } as any)}
+                  <span className="text-sm font-medium">{t}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div className="space-y-5">
+            <div>
+              <h2 className="section-title">Dress Code</h2>
+              <p className="muted mt-1">Select the expected dress code for this production.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {DRESS_CODES.map((d) => (
+                <button
+                  type="button"
+                  key={d}
+                  onClick={() => set("dress_code", { ...(form.dress_code ?? {}), code: d } as any)}
+                  className={cn(
+                    "btn flex h-16 flex-col items-center justify-center gap-1 text-center",
+                    form.dress_code?.code === d ? "bg-primary text-primary-fg border-primary" : "bg-surface text-fg border border-border hover:border-primary/60"
+                  )}
                 >
-                  <option value="">Select dress code</option>
-                  {DRESS_CODES.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
+                  <span className="text-sm font-medium">{d}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -529,7 +541,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             {errors[step] && errors[step].length > 0 && step < 7 && (
               <span className="text-xs text-danger">{errors[step].map((e) => `• ${e}`).join(" ")}</span>
             )}
-            {step < 6 ? (
+            {step < 7 ? (
               <button type="button" disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="btn-primary disabled:opacity-30">
                 Next <ChevronRight size={15} />
               </button>
