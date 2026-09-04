@@ -79,7 +79,7 @@ async function insertBooking(input: BookingInput, userId: string): Promise<strin
     `insert into bookings
        (person_id, program_id, channel_id, production_date, call_time, start_time, end_time,
         live_recorded, episode_number, recorded_episodes_count, location_id, extra_notes, created_by, confirmation_status)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'Pending Confirmation')
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'Confirmed')
      returning id`,
     [
       input.person_id, input.program_id, input.channel_id, input.production_date,
