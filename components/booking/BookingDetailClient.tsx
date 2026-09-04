@@ -19,7 +19,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { CONFIRMATION_STATUSES, waLink as makeWaLink, formatDate, formatTime, timeAgo } from "@/lib/utils";
-import { cancelBooking, duplicateBooking, deleteBooking } from "@/services/bookings";
+import { cancelBooking, duplicateBooking } from "@/services/bookings";
 import { recordWhatsapp } from "@/services/crud";
 import { canEditBooking, canDeleteBooking, canChangeStatus } from "@/lib/auth";
 import { buildWhatsappMessage } from "@/lib/whatsapp";
