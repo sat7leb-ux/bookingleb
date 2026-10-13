@@ -477,7 +477,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <div className="space-y-5">
             <div>
               <h2 className="section-title">Dress Code</h2>
@@ -505,7 +505,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {step === 5 && (
+        {step === 6 && (
           <div className="space-y-5">
             <div>
               <h2 className="section-title">Review</h2>
@@ -537,10 +537,10 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
             <ChevronLeft size={15} /> Back
           </button>
           <div className="flex items-center gap-2">
-            {errors[step] && errors[step].length > 0 && step < 7 && (
+            {errors[step] && errors[step].length > 0 && step < 6 && (
               <span className="text-xs text-danger">{errors[step].map((e) => `• ${e}`).join(" ")}</span>
             )}
-            {step < 7 ? (
+            {step < 6 ? (
               <button type="button" disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="btn-primary disabled:opacity-30">
                 Next <ChevronRight size={15} />
               </button>
