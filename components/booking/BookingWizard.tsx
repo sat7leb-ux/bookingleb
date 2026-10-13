@@ -48,8 +48,7 @@ const STEPS = [
   { id: 1, label: "Person", icon: User },
   { id: 2, label: "Program", icon: Clapperboard },
   { id: 3, label: "Schedule", icon: CalendarClock },
-  { id: 4, label: "Production", icon: SlidersHorizontal },
-  { id: 5, label: "Transport", icon: Truck },
+  { id: 4, label: "Transport", icon: Truck },
   { id: 6, label: "Dress", icon: Shirt },
   { id: 7, label: "Review", icon: CheckCircle2 },
 ];
@@ -414,7 +413,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
                 <input type="time" className={`input ${form.call_time ? "" : "border-danger"}`} value={form.call_time ?? ""} onChange={(e) => set("call_time", e.target.value)} />
               </div>
               <div>
-                <label className="label">Start time</label>
+                <label className="label">Top Camera</label>
                 <input type="time" className="input" value={form.start_time ?? ""} onChange={(e) => set("start_time", e.target.value)} />
               </div>
               <div>

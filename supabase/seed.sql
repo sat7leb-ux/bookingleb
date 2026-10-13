@@ -33,6 +33,12 @@ on conflict (id) do nothing;
 insert into public.locations (id, name, address) values
   ('22222222-2222-2222-2222-222222222204', 'Outdoor OBVAN', 'OBVAN')
 on conflict (id) do nothing;
+insert into public.locations (id, name, address) values
+  ('22222222-2222-2222-2222-222222222205', 'OUTDOOR', 'Outdoor location')
+on conflict (id) do nothing;
+insert into public.locations (id, name, address) values
+  ('22222222-2222-2222-2222-222222222206', 'SAT-7 premises', 'SAT-7 premises address')
+on conflict (id) do nothing;
 
 -- People
 insert into public.people (id, full_name, whatsapp, email, department, company, notes) values
