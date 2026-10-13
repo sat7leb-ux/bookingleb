@@ -49,8 +49,8 @@ const STEPS = [
   { id: 2, label: "Program", icon: Clapperboard },
   { id: 3, label: "Schedule", icon: CalendarClock },
   { id: 4, label: "Transport", icon: Truck },
-  { id: 6, label: "Dress", icon: Shirt },
-  { id: 7, label: "Review", icon: CheckCircle2 },
+  { id: 5, label: "Dress", icon: Shirt },
+  { id: 6, label: "Review", icon: CheckCircle2 },
 ];
 
 export function BookingWizard({ people, programs, channels, locations, initial, editMode }: WizardProps) {
@@ -438,37 +438,6 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
         {step === 4 && (
           <div className="space-y-5">
             <div>
-              <h2 className="section-title">Production Requirements</h2>
-              <p className="muted mt-1">Camera placements and timing details.</p>
-            </div>
-            <div className="rounded-xl border border-border bg-surface-2/40 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-primary">
-                <SlidersHorizontal size={16} /> Place-In Camera
-              </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="Place-In" value={form.requirements?.place_in ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in: e.target.value })} />
-                <input type="time" className="input" placeholder="Time" value={form.requirements?.place_in_time ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_time: e.target.value })} />
-                <input className="input" placeholder="Location" value={form.requirements?.place_in_location ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_location: e.target.value })} />
-              </div>
-              <textarea className="input mt-3 min-h-[50px]" placeholder="Place-In notes" value={form.requirements?.place_in_notes ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), place_in_notes: e.target.value })} />
-            </div>
-            <div className="rounded-xl border border-border bg-surface-2/40 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-medium text-accent">
-                <SlidersHorizontal size={16} /> Top Camera
-              </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input className="input" placeholder="Top Camera" value={form.requirements?.top_camera ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera: e.target.value })} />
-                <input type="time" className="input" placeholder="Time" value={form.requirements?.top_camera_time ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_time: e.target.value })} />
-                <input className="input" placeholder="Location" value={form.requirements?.top_camera_location ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_location: e.target.value })} />
-              </div>
-              <textarea className="input mt-3 min-h-[50px]" placeholder="Top Camera notes" value={form.requirements?.top_camera_notes ?? ""} onChange={(e) => set("requirements", { ...(form.requirements ?? {}), top_camera_notes: e.target.value })} />
-            </div>
-          </div>
-        )}
-
-        {step === 5 && (
-          <div className="space-y-5">
-            <div>
               <h2 className="section-title">Transportation</h2>
               <p className="muted mt-1">Select the transport type and provide the driver details.</p>
             </div>
@@ -508,7 +477,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {step === 6 && (
+        {step === 4 && (
           <div className="space-y-5">
             <div>
               <h2 className="section-title">Dress Code</h2>
@@ -536,7 +505,7 @@ export function BookingWizard({ people, programs, channels, locations, initial, 
           </div>
         )}
 
-        {step === 7 && (
+        {step === 5 && (
           <div className="space-y-5">
             <div>
               <h2 className="section-title">Review</h2>
